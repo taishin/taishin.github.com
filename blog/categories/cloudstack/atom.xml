@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[ああ Blog]]></title>
-  <link href="http://taishin.github.com/atom.xml" rel="self"/>
+  <title><![CDATA[Category: cloudstack | ああ Blog]]></title>
+  <link href="http://taishin.github.com/blog/categories/cloudstack/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
   <updated>2012-11-03T00:09:05+09:00</updated>
   <id>http://taishin.github.com/</id>
@@ -24,7 +24,7 @@
 
 <p>Virtioを使う場合は、OSの種類をPV-enabledのものしないといけないらしい。</p>
 
-<p><a href="https://svn.apache.org/repos/asf/incubator/cloudstack/docsite/html/docs/en-US/Apache_CloudStack/4.0.0-incubating/html-single/Admin_Guide/index.html">CloudStack Administrator&#8217;s Guide</a></p>
+<p><a href="https://svn.apache.org/repos/asf/incubator/cloudstack/docsite/html/docs/en-US/Apache_CloudStack/4.0.0-incubating/html-single/Admin_Guide/index.html">CloudStack Administrator's Guide</a></p>
 
 <blockquote><p>(KVM only) If you choose an OS that is PV-enabled, the VMs created from this ISO will have a SCSI (virtio) root disk. If the OS is not PV-enabled, the VMs will have an IDE root disk. The PV-enabled types are:</p></blockquote>
 
@@ -37,35 +37,6 @@
 <li><p>Virtioのドライバをインストールするとディスクが見えてくるので、
 再度WindowsのISOアタッチして、インストールできる。</p></li>
 </ol>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Octopressテーマ]]></title>
-    <link href="http://taishin.github.com/blog/2012/11/02/octopresstema/"/>
-    <updated>2012-11-02T23:49:00+09:00</updated>
-    <id>http://taishin.github.com/blog/2012/11/02/octopresstema</id>
-    <content type="html"><![CDATA[<p><a href="https://github.com/imathis/octopress/wiki/3rd-Party-Octopress-Themes">https://github.com/imathis/octopress/wiki/3rd-Party-Octopress-Themes</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Github+Octopress導入]]></title>
-    <link href="http://taishin.github.com/blog/2012/11/02/tou-gao-tesuto/"/>
-    <updated>2012-11-02T22:19:00+09:00</updated>
-    <id>http://taishin.github.com/blog/2012/11/02/tou-gao-tesuto</id>
-    <content type="html"><![CDATA[<ul>
-<li><a href="http://octopress.org/docs/">http://octopress.org/docs/</a></li>
-<li><a href="http://www.hisasann.com/blog/2012/10/06/first-post/">http://www.hisasann.com/blog/2012/10/06/first-post/</a></li>
-<li><a href="http://shogo82148.github.com/blog/2012/03/21/test/">http://shogo82148.github.com/blog/2012/03/21/test/</a></li>
-<li><a href="http://mizchi.github.com/blog/2012/09/22/octopress-memo/">http://mizchi.github.com/blog/2012/09/22/octopress-memo/</a>
-
-<ul>
-<li>zshの問題とかも</li>
-</ul>
-</li>
-</ul>
 
 ]]></content>
   </entry>
