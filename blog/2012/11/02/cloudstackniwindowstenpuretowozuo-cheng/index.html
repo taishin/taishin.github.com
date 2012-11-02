@@ -156,7 +156,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://taishin.github.com/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/" data-via="" data-counturl="http://taishin.github.com/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://taishin.github.com/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/" data-via="taishin" data-counturl="http://taishin.github.com/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/" >Tweet</a>
   
   
   
@@ -195,6 +195,22 @@
   </ul>
 </section>
 
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("taishin", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/taishin" class="twitter-follow-button" data-show-count="false">Follow @taishin</a>
+  
+</section>
 
 
 
