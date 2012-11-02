@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[ああ Blog]]></title>
+  <title><![CDATA[Taishin Blog]]></title>
   <link href="http://taishin.github.com/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2012-11-03T00:09:05+09:00</updated>
+  <updated>2012-11-03T00:09:50+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
