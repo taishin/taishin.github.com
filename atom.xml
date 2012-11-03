@@ -4,7 +4,7 @@
   <title><![CDATA[G1BS.0N]]></title>
   <link href="http://taishin.github.com/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2012-11-03T14:39:37+09:00</updated>
+  <updated>2012-11-03T14:48:30+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -12,6 +12,15 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[OctopressをSublime Text 2で操作]]></title>
+    <link href="http://taishin.github.com/blog/2012/11/03/octopress/"/>
+    <updated>2012-11-03T14:47:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2012/11/03/octopress</id>
+    <content type="html"><![CDATA[<p><a href="http://blueplanet.github.com/blog/2012/10/16/sublime-text-2-octopress/">http://blueplanet.github.com/blog/2012/10/16/sublime-text-2-octopress/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[OctpressにComment追加]]></title>
