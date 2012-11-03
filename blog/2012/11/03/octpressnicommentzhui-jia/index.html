@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>CloudStackにWindowsテンプレートを作成 - G1BS.0N</title>
+  <title>OctpressにComment追加 - G1BS.0N</title>
   <meta name="author" content="taishin">
 
   
-  <meta name="description" content="Cloudstack＋KVMの環境に普通にWindowsを追加すると、NICがe1000、DiskがIDEになってしまう。 それをVirtioにする方法 Virtioを使う場合は、OSの種類をPV-enabledのものしないといけないらしい。 CloudStack Administrator&# &hellip;">
+  <meta name="description" content="Discusに登録しないといけないらしい。 http://cat.hackingisbelieving.org/blog/2012/08/14/how-to-install-octopress-on-your-github-pages/
+http://qiita.com/items/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://taishin.github.com/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/">
+  <link rel="canonical" href="http://taishin.github.com/blog/2012/11/03/octpressnicommentzhui-jia/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -76,7 +77,7 @@
   <header>
     
       
-        <h1 class="entry-title">CloudStackにWindowsテンプレートを作成</h1>
+        <h1 class="entry-title">OctpressにComment追加</h1>
       
     
     
@@ -93,7 +94,7 @@
   
 
 
-<time datetime="2012-11-02T23:54:00+09:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
+<time datetime="2012-11-03T14:34:00+09:00" pubdate data-updated="true">Nov 3<span>rd</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -102,25 +103,12 @@
   </header>
 
 
-<div class="entry-content"><p>Cloudstack＋KVMの環境に普通にWindowsを追加すると、NICがe1000、DiskがIDEになってしまう。</p>
+<div class="entry-content"><p>Discusに登録しないといけないらしい。</p>
 
-<p>それをVirtioにする方法</p>
-
-<p>Virtioを使う場合は、OSの種類をPV-enabledのものしないといけないらしい。</p>
-
-<p><a href="https://svn.apache.org/repos/asf/incubator/cloudstack/docsite/html/docs/en-US/Apache_CloudStack/4.0.0-incubating/html-single/Admin_Guide/index.html">CloudStack Administrator&#8217;s Guide</a></p>
-
-<blockquote><p>(KVM only) If you choose an OS that is PV-enabled, the VMs created from this ISO will have a SCSI (virtio) root disk. If the OS is not PV-enabled, the VMs will have an IDE root disk. The PV-enabled types are:</p></blockquote>
-
-<ol>
-<li><p>WindowsOSのISOを追加するときに、OSの種類をWindows PVにする</p></li>
-<li><p>そのISOでインスタンスをつくると、インスタンスのOSの種類もWindows PVになる</p></li>
-<li><p>起動してもVirtioのドライバがないので、ディスクが見えない。
-一旦、Windows OSのISOをデタッチして、virtio-win-0.1-30.isoををアタッチする。<br>
-<a href="http://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/">http://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/</a></p></li>
-<li><p>Virtioのドライバをインストールするとディスクが見えてくるので、
-再度WindowsのISOアタッチして、インストールできる。</p></li>
-</ol>
+<ul>
+<li><a href="http://cat.hackingisbelieving.org/blog/2012/08/14/how-to-install-octopress-on-your-github-pages/">http://cat.hackingisbelieving.org/blog/2012/08/14/how-to-install-octopress-on-your-github-pages/</a></li>
+<li><a href="http://qiita.com/items/70576232d9d317183683">http://qiita.com/items/70576232d9d317183683</a></li>
+</ul>
 
 </div>
 
@@ -144,12 +132,12 @@
   
 
 
-<time datetime="2012-11-02T23:54:00+09:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
+<time datetime="2012-11-03T14:34:00+09:00" pubdate data-updated="true">Nov 3<span>rd</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/cloud/'>cloud</a>, <a class='category' href='/blog/categories/cloudstack/'>cloudstack</a>
+    <a class='category' href='/blog/categories/octopress/'>octopress</a>
   
 </span>
 
@@ -158,7 +146,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://taishin.github.com/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/" data-via="taishin" data-counturl="http://taishin.github.com/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://taishin.github.com/blog/2012/11/03/octpressnicommentzhui-jia/" data-via="taishin" data-counturl="http://taishin.github.com/blog/2012/11/03/octpressnicommentzhui-jia/" >Tweet</a>
   
   
   
@@ -167,10 +155,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left articlenav" href="/blog/2012/11/02/octopresstema/" title="Previous Post: Octopressテーマ">&laquo; Octopressテーマ</a>
+        <a class="basic-alignment left articlenav" href="/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/" title="Previous Post: CloudStackにWindowsテンプレートを作成">&laquo; CloudStackにWindowsテンプレートを作成</a>
       
-      
-        <a class="basic-alignment right articlenav" href="/blog/2012/11/03/octpressnicommentzhui-jia/" title="Next Post: OctpressにComment追加">OctpressにComment追加 &raquo;</a>
       
     </p>
   </footer>
@@ -249,8 +235,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://taishin.github.com/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/';
-        var disqus_url = 'http://taishin.github.com/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/';
+        var disqus_identifier = 'http://taishin.github.com/blog/2012/11/03/octpressnicommentzhui-jia/';
+        var disqus_url = 'http://taishin.github.com/blog/2012/11/03/octpressnicommentzhui-jia/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -4,7 +4,7 @@
   <title><![CDATA[G1BS.0N]]></title>
   <link href="http://taishin.github.com/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2012-11-03T14:30:52+09:00</updated>
+  <updated>2012-11-03T14:39:37+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -12,6 +12,21 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[OctpressにComment追加]]></title>
+    <link href="http://taishin.github.com/blog/2012/11/03/octpressnicommentzhui-jia/"/>
+    <updated>2012-11-03T14:34:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2012/11/03/octpressnicommentzhui-jia</id>
+    <content type="html"><![CDATA[<p>Discusに登録しないといけないらしい。</p>
+
+<ul>
+<li><a href="http://cat.hackingisbelieving.org/blog/2012/08/14/how-to-install-octopress-on-your-github-pages/">http://cat.hackingisbelieving.org/blog/2012/08/14/how-to-install-octopress-on-your-github-pages/</a></li>
+<li><a href="http://qiita.com/items/70576232d9d317183683">http://qiita.com/items/70576232d9d317183683</a></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[CloudStackにWindowsテンプレートを作成]]></title>
