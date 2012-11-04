@@ -4,7 +4,7 @@
   <title><![CDATA[G1BS.0N]]></title>
   <link href="http://taishin.github.com/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2012-11-04T22:22:41+09:00</updated>
+  <updated>2012-11-04T22:30:12+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -30,14 +30,13 @@
 
 
 <ol>
-<li>DNSzoneスキーマを組み込む</li>
+<li>DNSzoneスキーマを組み込む
+/etc/openldap/slapd.conf に追加</li>
 </ol>
 
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/openldap/slapd.conf に追加
-</span><span class='line'>include /etc/openldap/schema/dnszone.schema</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>include /etc/openldap/schema/dnszone.schema</span></code></pre></td></tr></table></div></figure>
 
 
 <ol>
