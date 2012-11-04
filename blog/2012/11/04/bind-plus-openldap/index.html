@@ -5,14 +5,15 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Github+Octopress導入 - G1BS.0N</title>
+  <title>Bind + OpenLDAP - G1BS.0N</title>
   <meta name="author" content="taishin">
 
   
-  <meta name="description" content="http://octopress.org/docs/
-http://www.hisasann.com/blog/2012/10/06/first-post/
-http://shogo82148.github.com/blog/2012/03/21/test/
-http://mizchi. &hellip;">
+  <meta name="description" content="BindのバックエンドDBをOpenLDAPにしてみる bind-sdbをインストールする 1
+# sudo yum install bind-sdb DNSzoneスキーマを組み込む 1
+2
+/etc/openldap/slapd.conf に追加
+include /etc/openldap/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +22,7 @@ http://mizchi. &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://taishin.github.com/blog/2012/11/02/tou-gao-tesuto/">
+  <link rel="canonical" href="http://taishin.github.com/blog/2012/11/04/bind-plus-openldap/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +80,7 @@ http://mizchi. &hellip;">
   <header>
     
       
-        <h1 class="entry-title">Github+Octopress導入</h1>
+        <h1 class="entry-title">Bind + OpenLDAP</h1>
       
     
     
@@ -96,7 +97,7 @@ http://mizchi. &hellip;">
   
 
 
-<time datetime="2012-11-02T22:19:00+09:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
+<time datetime="2012-11-04T10:18:00+09:00" pubdate data-updated="true">Nov 4<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,17 +106,45 @@ http://mizchi. &hellip;">
   </header>
 
 
-<div class="entry-content"><ul>
-<li><a href="http://octopress.org/docs/">http://octopress.org/docs/</a></li>
-<li><a href="http://www.hisasann.com/blog/2012/10/06/first-post/">http://www.hisasann.com/blog/2012/10/06/first-post/</a></li>
-<li><a href="http://shogo82148.github.com/blog/2012/03/21/test/">http://shogo82148.github.com/blog/2012/03/21/test/</a></li>
-<li><a href="http://mizchi.github.com/blog/2012/09/22/octopress-memo/">http://mizchi.github.com/blog/2012/09/22/octopress-memo/</a>
+<div class="entry-content"><p>BindのバックエンドDBをOpenLDAPにしてみる</p>
 
-<ul>
-<li>zshの問題とかも</li>
-</ul>
-</li>
-</ul>
+<ol>
+<li>bind-sdbをインストールする</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># sudo yum install bind-sdb</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>DNSzoneスキーマを組み込む</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/openldap/slapd.conf に追加
+</span><span class='line'>include /etc/openldap/schema/dnszone.schema</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>構成はこんな感じ</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root - Hosts --- example.com ------------- @(SOA NS)
+</span><span class='line'>              |                         |- server1(A)
+</span><span class='line'>              |                         |- www(CNAME)
+</span><span class='line'>              |
+</span><span class='line'>              |- 1.168.192.in-addr.arpa -- @(SOA NS)
+</span><span class='line'>                                        |- 1(PTR)</span></code></pre></td></tr></table></div></figure>
 
 </div>
 
@@ -139,12 +168,12 @@ http://mizchi. &hellip;">
   
 
 
-<time datetime="2012-11-02T22:19:00+09:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
+<time datetime="2012-11-04T10:18:00+09:00" pubdate data-updated="true">Nov 4<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/octopress/'>octopress</a>
+    <a class='category' href='/blog/categories/linux/'>linux</a>
   
 </span>
 
@@ -153,7 +182,7 @@ http://mizchi. &hellip;">
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://taishin.github.com/blog/2012/11/02/tou-gao-tesuto/" data-via="taishin" data-counturl="http://taishin.github.com/blog/2012/11/02/tou-gao-tesuto/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://taishin.github.com/blog/2012/11/04/bind-plus-openldap/" data-via="taishin" data-counturl="http://taishin.github.com/blog/2012/11/04/bind-plus-openldap/" >Tweet</a>
   
   
   
@@ -162,8 +191,8 @@ http://mizchi. &hellip;">
     
     <p class="meta">
       
+        <a class="basic-alignment left articlenav" href="/blog/2012/11/03/octopress/" title="Previous Post: OctopressをSublime Text 2で操作">&laquo; OctopressをSublime Text 2で操作</a>
       
-        <a class="basic-alignment right articlenav" href="/blog/2012/11/02/octopresstema/" title="Next Post: Octopressテーマ">Octopressテーマ &raquo;</a>
       
     </p>
   </footer>
@@ -246,8 +275,8 @@ http://mizchi. &hellip;">
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://taishin.github.com/blog/2012/11/02/tou-gao-tesuto/';
-        var disqus_url = 'http://taishin.github.com/blog/2012/11/02/tou-gao-tesuto/';
+        var disqus_identifier = 'http://taishin.github.com/blog/2012/11/04/bind-plus-openldap/';
+        var disqus_url = 'http://taishin.github.com/blog/2012/11/04/bind-plus-openldap/';
         var disqus_script = 'embed.js';
       
     (function () {

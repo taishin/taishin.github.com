@@ -4,7 +4,7 @@
   <title><![CDATA[G1BS.0N]]></title>
   <link href="http://taishin.github.com/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2012-11-03T14:48:30+09:00</updated>
+  <updated>2012-11-04T22:22:41+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Bind + OpenLDAP]]></title>
+    <link href="http://taishin.github.com/blog/2012/11/04/bind-plus-openldap/"/>
+    <updated>2012-11-04T10:18:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2012/11/04/bind-plus-openldap</id>
+    <content type="html"><![CDATA[<p>BindのバックエンドDBをOpenLDAPにしてみる</p>
+
+<ol>
+<li>bind-sdbをインストールする</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># sudo yum install bind-sdb</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>DNSzoneスキーマを組み込む</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/openldap/slapd.conf に追加
+</span><span class='line'>include /etc/openldap/schema/dnszone.schema</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>構成はこんな感じ</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root - Hosts --- example.com ------------- @(SOA NS)
+</span><span class='line'>              |                         |- server1(A)
+</span><span class='line'>              |                         |- www(CNAME)
+</span><span class='line'>              |
+</span><span class='line'>              |- 1.168.192.in-addr.arpa -- @(SOA NS)
+</span><span class='line'>                                        |- 1(PTR)</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[OctopressをSublime Text 2で操作]]></title>
