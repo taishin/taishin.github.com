@@ -81,7 +81,7 @@ VMwareのサイトにPerlのSDKがありますが、書き方が分かりにく�
   <header>
     
       <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
-        <h1 class="entry-title"><a href="/blog/2012/11/11/zabbixde/">ZabbixでESXiのVMごとに監視してみる</a></h1>
+        <h1 class="entry-title"><a href="/blog/2012/11/11/zabbixde/">Zabbix2.0でESXiのVMごとに監視してみる</a></h1>
       
     
     
@@ -130,7 +130,7 @@ VMwareのサイトにPerlのSDKがありますが、書き方が分かりにく�
 <p>これでステータスが取れます。簡単です。<br>
 取得する値は、
 <a href="http://pubs.vmware.com/vsphere-51/index.jsp?topic=%2Fcom.vmware.wssdk.apiref.doc%2Fright-pane.html">VMware vSphere API Reference Documentation</a>
-とか
+とか https://(vCenter)/mob
 を参照します。</p>
 
 <p>Zabbixへの取込み方は、
@@ -150,11 +150,117 @@ VM、ESXi、データストアそれぞれをZabbixに監視ホストとして�
 
 <h2>RbVmomiスクリプト</h2>
 
-<p>で、スクリプトは下記のようになります。</p>
+<p>で、スクリプトはこんな感じになりました。</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">aaa</span>
-</span></code></pre></td></tr></table></div></figure>
+<div><script src='https://gist.github.com/4054887.js?file='></script>
+<noscript><pre><code>#!/usr/bin/ruby
+
+require 'rubygems'  
+require 'rbvmomi'
+require 'pp'
+
+
+filepath = &quot;/tmp/vsphere/&quot;
+
+begin
+vim = RbVmomi::VIM.connect :host =&gt; ARGV[0], :user =&gt; ARGV[1], :password =&gt; ARGV[2], :insecure =&gt; true
+rescue =&gt; exc
+p exc
+exit
+end
+
+#
+# cennect datacenter
+#
+begin
+dc = vim.serviceInstance.find_datacenter
+rescue =&gt; exc
+p exc
+exit
+end
+
+#
+# get Host state
+#
+
+host = dc.hostFolder.children.first.host.grep(RbVmomi::VIM::HostSystem).each do |h|
+
+host = h.name.gsub(/:/,&quot;-&quot;)
+begin
+hfile = open(filepath + &quot;h_&quot; + host, &quot;w&quot;)
+rescue =&gt; exc
+p exc
+exit
+end
+hfile.print &quot;host-Hostname:&quot;, h.name, &quot;\n&quot;
+hfile.print &quot;host-Product:&quot;, h.summary.config.product.fullName, &quot;\n&quot;
+hfile.print &quot;host-HardwareMode:&quot;, h.summary.hardware.model, &quot;\n&quot;
+hfile.print &quot;host-CPUModel:&quot;, h.summary.hardware.cpuModel, &quot;\n&quot;
+hfile.print &quot;host-CPUMHz:&quot;, h.summary.hardware.cpuMhz, &quot;\n&quot;
+hfile.print &quot;host-CPUCore:&quot;, h.summary.hardware.numCpuCores, &quot;\n&quot;
+hfile.print &quot;host-CPUUsage:&quot;, h.summary.quickStats.overallCpuUsage, &quot;\n&quot;
+hfile.print &quot;host-TotalMemorySize:&quot;, h.summary.hardware.memorySize/1024/1024, &quot;\n&quot;
+hfile.print &quot;host-MemoryUsage:&quot;, h.summary.quickStats.overallMemoryUsage, &quot;\n&quot;
+hfile.print &quot;host-PowerState:&quot;, h.summary.runtime.powerState, &quot;\n&quot;
+hfile.print &quot;host-MaintenanceMode:&quot;, h.summary.runtime.inMaintenanceMode, &quot;\n&quot;
+   hfile.print &quot;host-Uptime:&quot;, h.summary.quickStats.uptime, &quot;\n&quot;
+hfile.close
+end
+
+#
+# get Datastore status
+#
+datastore = dc.datastore.grep(RbVmomi::VIM::Datastore).each do |d|
+ds = d.name.gsub(/:/,&quot;-&quot;)
+begin
+dfile = open(filepath + &quot;d_&quot; + ds, &quot;w&quot;)
+rescue =&gt; exc
+p exc
+exit
+end
+dfile.print &quot;ds-Name:&quot;, d.name, &quot;\n&quot;
+dfile.print &quot;ds-Capacity:&quot;, d.summary.capacity, &quot;\n&quot;
+dfile.print &quot;ds-FreeSpace:&quot;, d.summary.freeSpace, &quot;\n&quot;
+dfile.print &quot;ds-VM:&quot;
+vm = d.vm.grep(RbVmomi::VIM::VirtualMachine).each do |v|
+dfile.print &quot;\&quot;&quot;, v.name, &quot;\&quot;&quot;, &quot; &quot;
+end
+dfile.print &quot;\n&quot;
+dfile.close
+end
+
+#
+# get VirtualMachin status
+#
+vs = dc.vmFolder.childEntity.grep(RbVmomi::VIM::VirtualMachine).each do |v|
+vm = v.name.gsub(/:/,&quot;-&quot;)
+begin
+vfile = open(filepath + &quot;v_&quot; + vm, &quot;w&quot;)
+rescue
+p exc
+exit
+end
+vfile.print &quot;vm-Name:&quot;, v.name, &quot;\n&quot;
+vfile.print &quot;vm-ESXi:&quot;, v.runtime.host.name, &quot;\n&quot;
+vfile.print &quot;vm-powerState:&quot;, v.summary.runtime.powerState, &quot;\n&quot;
+vfile.print &quot;vm-guestFullName:&quot;, v.summary.guest.guestFullName, &quot;\n&quot;
+vfile.print &quot;vm-HostName:&quot;, v.summary.guest.hostName, &quot;\n&quot;
+vfile.print &quot;vm-IPAddress:&quot;, v.summary.guest.ipAddress, &quot;\n&quot;
+vfile.print &quot;vm-VMwareTools:&quot;, v.summary.guest.toolsStatus, &quot;\n&quot;
+vfile.print &quot;vm-maxCpuUsage:&quot;, v.summary.runtime.maxCpuUsage, &quot;\n&quot;
+vfile.print &quot;vm-numCpu:&quot;, v.summary.config.numCpu, &quot;\n&quot;
+vfile.print &quot;vm-overallCpuUsage:&quot;, v.summary.quickStats.overallCpuUsage, &quot;\n&quot;
+vfile.print &quot;vm-memorySizeMB:&quot;, v.summary.config.memorySizeMB, &quot;\n&quot;
+vfile.print &quot;vm-hostMemoryUsage:&quot;, v.summary.quickStats.hostMemoryUsage, &quot;\n&quot;
+vfile.print &quot;vm-guestMemoryUsage:&quot;, v.summary.quickStats.guestMemoryUsage, &quot;\n&quot;
+vfile.print &quot;vm-UncommittedStorage:&quot;, v.summary.storage.uncommitted, &quot;\n&quot;
+vfile.print &quot;vm-UsedStorage:&quot;, v.summary.storage.committed, &quot;\n&quot;
+vfile.print &quot;vm-UnsharedStorage:&quot;, v.summary.storage.unshared, &quot;\n&quot;
+vfile.print &quot;vm-Uptime:&quot;, v.summary.quickStats.uptimeSeconds, &quot;\n&quot;
+vfile.close
+end
+
+puts 0</code></pre></noscript></div>
 
 
 <p>/tmp/vsphere にファイルを保存するのdで、zabbixの実行ユーザに書き込み権を与えておきます。</p>
@@ -181,7 +287,7 @@ VM、ESXi、データストアそれぞれをZabbixに監視ホストとして�
 
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Timeout</span> <span class="o">=</span> <span class="mi">30</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Timeout</span><span class="o">=</span><span class="mi">30</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -191,17 +297,17 @@ VM、ESXi、データストアそれぞれをZabbixに監視ホストとして�
 
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">TImeout</span> <span class="o">=</span> <span class="mi">30</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">TImeout</span><span class="o">=</span><span class="mi">30</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>テンプレートをインポートします。</p>
 
 <ul>
-<li><a href="aaa.xml">vCenter用</a></li>
-<li><a href="aaa.xml">ESXi用</a></li>
-<li><a href="aaa.xml">データストア用</a></li>
-<li><a href="aaa.xml">VM用</a></li>
+<li><a href="https://github.com/taishin/rbvmoni-zabbix/blob/master/Template-vCenter.xml">vCenter用</a></li>
+<li><a href="https://github.com/taishin/rbvmoni-zabbix/blob/master/Template-vSphere-ESXi.xml">ESXi用</a></li>
+<li><a href="https://github.com/taishin/rbvmoni-zabbix/blob/master/Template-vSphere-Datastore.xml">データストア用</a></li>
+<li><a href="https://github.com/taishin/rbvmoni-zabbix/blob/master/Template-vSphere-VM.xml">VM用</a></li>
 </ul>
 
 
@@ -210,7 +316,7 @@ VM、ESXi、データストアそれぞれをZabbixに監視ホストとして�
 <p>下記のファイルを/etc/zabbix/zabbix_agentd.d/以下に保存します。</p>
 
 <ul>
-<li><a href="aaa.xml">rbvmomi</a></li>
+<li><a href="https://github.com/taishin/rbvmoni-zabbix/blob/master/userparameter_vsphere-vm.conf">userparameter_vsphere-vm.conf</a></li>
 </ul>
 
 
@@ -219,17 +325,18 @@ VM、ESXi、データストアそれぞれをZabbixに監視ホストとして�
 <p>Zabbixにホストとして、vCenterを登録します。</p>
 
 <pre>
-名前：適当
-IPアドレス：127.0.0.1
-ポート：10050
+ホスト
+- ホスト名：適当
+- エージェントのIPアドレス：127.0.0.1
+- ポート：10050
 
 テンプレート
-インポートしたvCenter用テンプレート
+- インポートしたvCenter用テンプレート
 
 マクロ
-{$HOST} : IPアドレス
-{$USER} : ユーザ名
-{$PASSWORD} ： パスワード
+- {$HOST} : IPアドレス
+- {$USERNAME} : ユーザ名
+- {$PASSWORD} ： パスワード
 </pre>
 
 
@@ -238,12 +345,13 @@ IPアドレス：127.0.0.1
 <h2>ESXi、データストア、VMの登録</h2>
 
 <pre>
-名前：各登録名
-IPアドレス：127.0.0.1
-ポート：10050
+ホスト
+- ホスト：各登録名
+- IPアドレス：127.0.0.1
+- ポート：10050
 
 テンプレート
-インポートしたESXi、データストア、VM用テンプレート
+- インポートしたESXi、データストア、VM用テンプレート
 </pre>
 
 
@@ -723,7 +831,7 @@ IPアドレス：127.0.0.1
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2012/11/11/zabbixde/">ZabbixでESXiのVMごとに監視してみる</a>
+        <a href="/blog/2012/11/11/zabbixde/">Zabbix2.0でESXiのVMごとに監視してみる</a>
       </li>
     
       <li class="post">
@@ -794,24 +902,7 @@ IPアドレス：127.0.0.1
 
 
 
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) {return;}
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
 
-
-
-  <script type="text/javascript">
-    (function() {
-      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
-      script.src = 'https://apis.google.com/js/plusone.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
-    })();
-  </script>
 
 
 
