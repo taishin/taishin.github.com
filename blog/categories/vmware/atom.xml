@@ -4,7 +4,7 @@
   <title><![CDATA[Category: VMware | G1BS.0N]]></title>
   <link href="http://taishin.github.com/blog/categories/vmware/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2012-11-12T00:04:59+09:00</updated>
+  <updated>2012-11-12T00:06:09+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -28,7 +28,7 @@ VMwareのサイトにPerlのSDKがありますが、書き方が分かりにく�
 <p>まずはインストール</p>
 
 <p><code>
-gem install rbvmoni
+gem install rbvmomi
 </code></p>
 
 <p>使い方
