@@ -9,9 +9,9 @@
   <meta name="author" content="taishin">
 
   
-  <meta name="description" content="BindのバックエンドDBをOpenLDAPにしてみる OSはCentOS6.3 bind-sdbをインストールする 1
-# sudo yum install bind-sdb DNSzoneスキーマを組み込む /etc/openldap/slapd.conf に追加 1
-include /etc &hellip;">
+  <meta name="description" content="vSphere APIを使えば、ESXiだけじゃなくて、VMごとのCPU、メモリなんかのステータスも取得てきます。
+取得した値をZabbixに食わせて、Zabbixで監視してみます。
+VMwareのサイトにPerlのSDKがありますが、書き方が分かりにくかったので、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,186 @@ include /etc &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2012/11/11/zabbixde/">ZabbixでESXiのVMごとに監視してみる</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-11T14:03:00+09:00" pubdate data-updated="true">Nov 11<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/11/zabbixde/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>vSphere APIを使えば、ESXiだけじゃなくて、VMごとのCPU、メモリなんかのステータスも取得てきます。
+取得した値をZabbixに食わせて、Zabbixで監視してみます。
+VMwareのサイトにPerlのSDKがありますが、書き方が分かりにくかったので、
+今回はRubyのRbVmomiを使ってみます。</p>
+
+<p><a href="https://github.com/rlane/rbvmomi">RbVmomi</a></p>
+
+<p>まずはインストール</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gem install rbvmoni</span></code></pre></td></tr></table></div></figure>
+
+
+<p>使い方</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;rbvmomi&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>これでステータスが取れます。簡単です。<br>
+取得する値は、
+<a href="http://pubs.vmware.com/vsphere-51/index.jsp?topic=%2Fcom.vmware.wssdk.apiref.doc%2Fright-pane.html">VMware vSphere API Reference Documentation</a>
+とか
+を参照します。</p>
+
+<p>Zabbixへの取込み方は、
+<a href="http://www.zabbix.com/forum/showthread.php?t=15691">ESXi 4.0 Hardware and Software Monitoring VMWare </a>
+を参考にして、</p>
+
+<blockquote><ol>
+<li>取得した値をローカルにテキストで保存する</li>
+<li>それをZabbix AgentのUserParameterで取得する</li>
+</ol>
+</blockquote>
+
+<p>というやり方にしてみます。<br>
+上記のサイトでは１つのファイルにしていますが、VMごとに取得したいので、
+ついでに、ESXi、データストアのステータスも取得したいと思います。<br>
+VM、ESXi、データストアそれぞれをZabbixに監視ホストとして登録しようと思うので、それぞれ別ファイルにしてみます。</p>
+
+<h2>RbVmomiスクリプト</h2>
+
+<p>で、スクリプトは下記のようになります。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">aaa</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>/tmp/vsphere にファイルを保存するのdで、zabbixの実行ユーザに書き込み権を与えておきます。</p>
+
+<pre>chown zabbix:zabbix /var/vsphere</pre>
+
+
+<p>引数にvCenter(or ESXi)のIPアドレス、ユーザ名、パスワードを指定して実行します。</p>
+
+<pre>su -u zabbix rbvmomi-zabbix.rb 192.168.1.1 root password</pre>
+
+
+<p>成功すれば、/tmp/vspere以下にESXi、データストア、VMごとのファイルができます。</p>
+
+<h2>Zabbix設定</h2>
+
+<p>次はZabbix側です。</p>
+
+<p>まず、APIからのデータ取得は結構時間がかかるので、サーバ側、エージェント側両方のタイムアウトを30秒にして、再起動しておきます。</p>
+
+<ul>
+<li>/etc/zabbix/zabbix_server.conf</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Timeout</span> <span class="o">=</span> <span class="mi">30</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>/etc/zabbix/zabbix_agentd.conf</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">TImeout</span> <span class="o">=</span> <span class="mi">30</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>テンプレートをインポートします。</p>
+
+<ul>
+<li><a href="aaa.xml">vCenter用</a></li>
+<li><a href="aaa.xml">ESXi用</a></li>
+<li><a href="aaa.xml">データストア用</a></li>
+<li><a href="aaa.xml">VM用</a></li>
+</ul>
+
+
+<h2>Zabbix UserParameterの設定</h2>
+
+<p>下記のファイルを/etc/zabbix/zabbix_agentd.d/以下に保存します。</p>
+
+<ul>
+<li><a href="aaa.xml">rbvmomi</a></li>
+</ul>
+
+
+<h2>vCenterの登録</h2>
+
+<p>Zabbixにホストとして、vCenterを登録します。</p>
+
+<pre>
+名前：適当
+IPアドレス：127.0.0.1
+ポート：10050
+
+テンプレート
+インポートしたvCenter用テンプレート
+
+マクロ
+{$HOST} : IPアドレス
+{$USER} : ユーザ名
+{$PASSWORD} ： パスワード
+</pre>
+
+
+<p>これで、スクリプトが設定した間隔で実行されます。</p>
+
+<h2>ESXi、データストア、VMの登録</h2>
+
+<pre>
+名前：各登録名
+IPアドレス：127.0.0.1
+ポート：10050
+
+テンプレート
+インポートしたESXi、データストア、VM用テンプレート
+</pre>
+
+
+<p>名前に「:」が含まれていると、登録できないので、「-」に変換して登録してください。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -543,6 +723,10 @@ include /etc &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/11/11/zabbixde/">ZabbixでESXiのVMごとに監視してみる</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/11/04/bind-plus-openldap/">Bind + OpenLDAP</a>
       </li>
     
@@ -556,10 +740,6 @@ include /etc &hellip;">
     
       <li class="post">
         <a href="/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/">CloudStackにWindowsテンプレートを作成</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/02/octopresstema/">Octopressテーマ</a>
       </li>
     
   </ul>
@@ -597,40 +777,6 @@ include /etc &hellip;">
 </p>
 
 </footer>
-  
-
-<script type="text/javascript">
-      var disqus_shortname = 'g1bs0n';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
-
-
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
+  Liquid syntax error: Unknown tag 'endcomment'
 </body>
 </html>

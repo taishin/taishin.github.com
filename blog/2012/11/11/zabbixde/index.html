@@ -1,0 +1,378 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>ZabbixでESXiのVMごとに監視してみる - G1BS.0N</title>
+  <meta name="author" content="taishin">
+
+  
+  <meta name="description" content="vSphere APIを使えば、ESXiだけじゃなくて、VMごとのCPU、メモリなんかのステータスも取得てきます。
+取得した値をZabbixに食わせて、Zabbixで監視してみます。
+VMwareのサイトにPerlのSDKがありますが、書き方が分かりにくかったので、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://taishin.github.com/blog/2012/11/11/zabbixde/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="G1BS.0N" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">jk</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">G1BS.0N</a></h1>
+  
+    <h2>Tech Memo</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:taishin.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">ZabbixでESXiのVMごとに監視してみる</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-11T14:03:00+09:00" pubdate data-updated="true">Nov 11<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>vSphere APIを使えば、ESXiだけじゃなくて、VMごとのCPU、メモリなんかのステータスも取得てきます。
+取得した値をZabbixに食わせて、Zabbixで監視してみます。
+VMwareのサイトにPerlのSDKがありますが、書き方が分かりにくかったので、
+今回はRubyのRbVmomiを使ってみます。</p>
+
+<p><a href="https://github.com/rlane/rbvmomi">RbVmomi</a></p>
+
+<p>まずはインストール</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gem install rbvmoni</span></code></pre></td></tr></table></div></figure>
+
+
+<p>使い方</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;rbvmomi&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>これでステータスが取れます。簡単です。<br>
+取得する値は、
+<a href="http://pubs.vmware.com/vsphere-51/index.jsp?topic=%2Fcom.vmware.wssdk.apiref.doc%2Fright-pane.html">VMware vSphere API Reference Documentation</a>
+とか
+を参照します。</p>
+
+<p>Zabbixへの取込み方は、
+<a href="http://www.zabbix.com/forum/showthread.php?t=15691">ESXi 4.0 Hardware and Software Monitoring VMWare </a>
+を参考にして、</p>
+
+<blockquote><ol>
+<li>取得した値をローカルにテキストで保存する</li>
+<li>それをZabbix AgentのUserParameterで取得する</li>
+</ol>
+</blockquote>
+
+<p>というやり方にしてみます。<br>
+上記のサイトでは１つのファイルにしていますが、VMごとに取得したいので、
+ついでに、ESXi、データストアのステータスも取得したいと思います。<br>
+VM、ESXi、データストアそれぞれをZabbixに監視ホストとして登録しようと思うので、それぞれ別ファイルにしてみます。</p>
+
+<h2>RbVmomiスクリプト</h2>
+
+<p>で、スクリプトは下記のようになります。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">aaa</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>/tmp/vsphere にファイルを保存するのdで、zabbixの実行ユーザに書き込み権を与えておきます。</p>
+
+<pre>chown zabbix:zabbix /var/vsphere</pre>
+
+
+<p>引数にvCenter(or ESXi)のIPアドレス、ユーザ名、パスワードを指定して実行します。</p>
+
+<pre>su -u zabbix rbvmomi-zabbix.rb 192.168.1.1 root password</pre>
+
+
+<p>成功すれば、/tmp/vspere以下にESXi、データストア、VMごとのファイルができます。</p>
+
+<h2>Zabbix設定</h2>
+
+<p>次はZabbix側です。</p>
+
+<p>まず、APIからのデータ取得は結構時間がかかるので、サーバ側、エージェント側両方のタイムアウトを30秒にして、再起動しておきます。</p>
+
+<ul>
+<li>/etc/zabbix/zabbix_server.conf</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Timeout</span> <span class="o">=</span> <span class="mi">30</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>/etc/zabbix/zabbix_agentd.conf</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">TImeout</span> <span class="o">=</span> <span class="mi">30</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>テンプレートをインポートします。</p>
+
+<ul>
+<li><a href="aaa.xml">vCenter用</a></li>
+<li><a href="aaa.xml">ESXi用</a></li>
+<li><a href="aaa.xml">データストア用</a></li>
+<li><a href="aaa.xml">VM用</a></li>
+</ul>
+
+
+<h2>Zabbix UserParameterの設定</h2>
+
+<p>下記のファイルを/etc/zabbix/zabbix_agentd.d/以下に保存します。</p>
+
+<ul>
+<li><a href="aaa.xml">rbvmomi</a></li>
+</ul>
+
+
+<h2>vCenterの登録</h2>
+
+<p>Zabbixにホストとして、vCenterを登録します。</p>
+
+<pre>
+名前：適当
+IPアドレス：127.0.0.1
+ポート：10050
+
+テンプレート
+インポートしたvCenter用テンプレート
+
+マクロ
+{$HOST} : IPアドレス
+{$USER} : ユーザ名
+{$PASSWORD} ： パスワード
+</pre>
+
+
+<p>これで、スクリプトが設定した間隔で実行されます。</p>
+
+<h2>ESXi、データストア、VMの登録</h2>
+
+<pre>
+名前：各登録名
+IPアドレス：127.0.0.1
+ポート：10050
+
+テンプレート
+インポートしたESXi、データストア、VM用テンプレート
+</pre>
+
+
+<p>名前に「:」が含まれていると、登録できないので、「-」に変換して登録してください。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">taishin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-11T14:03:00+09:00" pubdate data-updated="true">Nov 11<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/vmware/'>VMware</a>, <a class='category' href='/blog/categories/zabbix/'>Zabbix</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://taishin.github.com/blog/2012/11/11/zabbixde/" data-via="taishin" data-counturl="http://taishin.github.com/blog/2012/11/11/zabbixde/" >Tweet</a>
+  
+  
+  <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button"
+    data-hatena-bookmark-layout="standard"
+    data-hatena-bookmark-url="http://taishin.github.com/blog/2012/11/11/zabbixde/">
+    <img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none">
+  </a>
+
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2012/11/04/bind-plus-openldap/" title="Previous Post: Bind + OpenLDAP">&laquo; Bind + OpenLDAP</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/11/11/zabbixde/">ZabbixでESXiのVMごとに監視してみる</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/04/bind-plus-openldap/">Bind + OpenLDAP</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/03/octopress/">OctopressをSublime Text 2で操作</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/03/octpressnicommentzhui-jia/">OctpressにComment追加</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/">CloudStackにWindowsテンプレートを作成</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("taishin", 0, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/taishin" class="twitter-follow-button" data-show-count="false">Follow @taishin</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - taishin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  Liquid syntax error: Unknown tag 'endcomment'
+</body>
+</html>

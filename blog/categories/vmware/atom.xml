@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: VMware | G1BS.0N]]></title>
+  <link href="http://taishin.github.com/blog/categories/vmware/atom.xml" rel="self"/>
+  <link href="http://taishin.github.com/"/>
+  <updated>2012-11-11T16:23:13+09:00</updated>
+  <id>http://taishin.github.com/</id>
+  <author>
+    <name><![CDATA[taishin]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ZabbixでESXiのVMごとに監視してみる]]></title>
+    <link href="http://taishin.github.com/blog/2012/11/11/zabbixde/"/>
+    <updated>2012-11-11T14:03:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2012/11/11/zabbixde</id>
+    <content type="html"><![CDATA[<p>vSphere APIを使えば、ESXiだけじゃなくて、VMごとのCPU、メモリなんかのステータスも取得てきます。
+取得した値をZabbixに食わせて、Zabbixで監視してみます。
+VMwareのサイトにPerlのSDKがありますが、書き方が分かりにくかったので、
+今回はRubyのRbVmomiを使ってみます。</p>
+
+<p><a href="https://github.com/rlane/rbvmomi">RbVmomi</a></p>
+
+<p>まずはインストール</p>
+
+<p><code>
+gem install rbvmoni
+</code></p>
+
+<p>使い方
+<code>ruby
+require 'rbvmomi'
+</code>
+これでステータスが取れます。簡単です。<br>
+取得する値は、
+<a href="http://pubs.vmware.com/vsphere-51/index.jsp?topic=%2Fcom.vmware.wssdk.apiref.doc%2Fright-pane.html">VMware vSphere API Reference Documentation</a>
+とか
+を参照します。</p>
+
+<p>Zabbixへの取込み方は、
+<a href="http://www.zabbix.com/forum/showthread.php?t=15691">ESXi 4.0 Hardware and Software Monitoring VMWare </a>
+を参考にして、</p>
+
+<blockquote><ol>
+<li>取得した値をローカルにテキストで保存する</li>
+<li>それをZabbix AgentのUserParameterで取得する</li>
+</ol>
+</blockquote>
+
+<p>というやり方にしてみます。<br>
+上記のサイトでは１つのファイルにしていますが、VMごとに取得したいので、
+ついでに、ESXi、データストアのステータスも取得したいと思います。<br>
+VM、ESXi、データストアそれぞれをZabbixに監視ホストとして登録しようと思うので、それぞれ別ファイルにしてみます。</p>
+
+<h2>RbVmomiスクリプト</h2>
+
+<p>で、スクリプトは下記のようになります。</p>
+
+<p><code>
+aaa
+</code></p>
+
+<p>/tmp/vsphere にファイルを保存するのdで、zabbixの実行ユーザに書き込み権を与えておきます。</p>
+
+<pre>chown zabbix:zabbix /var/vsphere</pre>
+
+
+<p>引数にvCenter(or ESXi)のIPアドレス、ユーザ名、パスワードを指定して実行します。</p>
+
+<pre>su -u zabbix rbvmomi-zabbix.rb 192.168.1.1 root password</pre>
+
+
+<p>成功すれば、/tmp/vspere以下にESXi、データストア、VMごとのファイルができます。</p>
+
+<h2>Zabbix設定</h2>
+
+<p>次はZabbix側です。</p>
+
+<p>まず、APIからのデータ取得は結構時間がかかるので、サーバ側、エージェント側両方のタイムアウトを30秒にして、再起動しておきます。</p>
+
+<ul>
+<li><p>/etc/zabbix/zabbix_server.conf
+<code>
+Timeout = 30
+</code></p></li>
+<li><p>/etc/zabbix/zabbix_agentd.conf
+<code>
+TImeout = 30
+</code></p></li>
+</ul>
+
+
+<p>テンプレートをインポートします。</p>
+
+<ul>
+<li><a href="aaa.xml">vCenter用</a></li>
+<li><a href="aaa.xml">ESXi用</a></li>
+<li><a href="aaa.xml">データストア用</a></li>
+<li><a href="aaa.xml">VM用</a></li>
+</ul>
+
+
+<h2>Zabbix UserParameterの設定</h2>
+
+<p>下記のファイルを/etc/zabbix/zabbix_agentd.d/以下に保存します。</p>
+
+<ul>
+<li><a href="aaa.xml">rbvmomi</a></li>
+</ul>
+
+
+<h2>vCenterの登録</h2>
+
+<p>Zabbixにホストとして、vCenterを登録します。</p>
+
+<pre>
+名前：適当
+IPアドレス：127.0.0.1
+ポート：10050
+
+テンプレート
+インポートしたvCenter用テンプレート
+
+マクロ
+{$HOST} : IPアドレス
+{$USER} : ユーザ名
+{$PASSWORD} ： パスワード
+</pre>
+
+
+<p>これで、スクリプトが設定した間隔で実行されます。</p>
+
+<h2>ESXi、データストア、VMの登録</h2>
+
+<pre>
+名前：各登録名
+IPアドレス：127.0.0.1
+ポート：10050
+
+テンプレート
+インポートしたESXi、データストア、VM用テンプレート
+</pre>
+
+
+<p>名前に「:」が含まれていると、登録できないので、「-」に変換して登録してください。</p>
+]]></content>
+  </entry>
+  
+</feed>
