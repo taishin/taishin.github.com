@@ -4,7 +4,7 @@
   <title><![CDATA[Category: linux | G1BS.0N]]></title>
   <link href="http://taishin.github.com/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2012-11-11T16:44:00+09:00</updated>
+  <updated>2012-11-11T16:48:20+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -24,104 +24,184 @@
 
 <ul>
 <li><p>bind-sdbをインストールする
-{% codeblock %}</p>
-
-<h1>sudo yum install bind-sdb</h1>
-
-<p>{% endcodeblock %}</p></li>
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>sudo yum install bind-sdb&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
 <li><p>DNSzoneスキーマを組み込む</p></li>
 </ul>
 
 
 <p>/etc/openldap/slapd.conf に追加
-{% codeblock %}
-include /etc/openldap/schema/dnszone.schema
-{% endcodeblock %}
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>include /etc/openldap/schema/dnszone.schema</span></code></pre></td></tr></table></div></figure></notextile></div>
 * 構成はこんな感じ
-{% codeblock %}
-root - Hosts --- example.com ------------- @(SOA NS)</p>
-
-<pre><code>          |                         |- server1(A)
-          |                         |- www(CNAME)
-          |
-          |- 1.168.192.in-addr.arpa -- @(SOA NS)
-                                    |- 1(PTR)
-</code></pre>
-
-<p>{% endcodeblock %}</p>
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root - Hosts --- example.com ------------- @(SOA NS)&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>          |                         |- server1(A)
+</span><span class='line'>          |                         |- www(CNAME)
+</span><span class='line'>          |
+</span><span class='line'>          |- 1.168.192.in-addr.arpa -- @(SOA NS)
+</span><span class='line'>                                    |- 1(PTR)
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>LDIF
-{% codeblock %}
-dn: ou=Hosts,dc=example,dc=com
-objectclass: organizationalUnit
-objectclass: top
-ou: Hosts</p>
-
-<h1>正引き</h1>
-
-<p>dn: ou=example.com,ou=Hosts,dc=example,dc=com
-objectclass: organizationalUnit
-objectclass: top
-ou: example.com</p>
-
-<p>dn: relativeDomainName=@,ou=example.com,ou=Hosts,dc=example,dc=com
-dnsclass: IN
-dnsttl: 86400
-nsrecord: ns.example.com.
-objectclass: dNSZone
-objectclass: top
-relativedomainname: @
-soarecord: ns.example.com. root.example.com. 2012110303 28800 14400 3600000
- 86400
-zonename: example.com</p>
-
-<p>dn: relativeDomainName=server1,ou=example.com,ou=Hosts,dc=example,dc=com
-arecord: 192.168.1.1
-dnsclass: IN
-dnsttl: 3600
-objectclass: dNSZone
-objectclass: top
-relativedomainname: server1
-zonename: example.com</p>
-
-<p>dn: relativeDomainName=www,ou=example.com,ou=Hosts,dc=example,dc=com
-cnamerecord: server1
-dnsclass: IN
-dnsttl: 3600
-objectclass: dNSZone
-objectclass: top
-relativedomainname: www
-zonename: example.com</p>
-
-<h1>逆引き</h1>
-
-<p>dn: ou=1.168.192.in-addr.arpa,ou=Hosts,dc=example,dc=com
-objectclass: organizationalUnit
-objectclass: top
-ou: 1.168.192.in-addr.arpa</p>
-
-<p>dn: relativeDomainName=@,ou=1.168.192.in-addr.arpa,ou=Hosts,dc=example,dc=com
-arecord: 255.255.255.0
-dnsclass: IN
-dnsttl: 86400
-nsrecord: ns.example.com.
-objectclass: dNSZone
-objectclass: top
-ptrrecord: example.com.
-relativedomainname: @
-soarecord: ns.example.com. root.example.com. 2012110302 28800 14400 3600000
- 86400
-zonename: 1.168.192.in-addr.arpa</p>
-
-<p>dn: relativeDomainName=1,ou=1.168.192.in-addr.arpa,ou=Hosts,dc=example,dc=com
-dnsclass: IN
-dnsttl: 3600
-objectclass: dNSZone
-objectclass: top
-ptrrecord: server1.example.com.
-relativedomainname: 1
-zonename: 1.168.192.in-addr.arpa
-{% endcodeblock %}</p>
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>dn: ou=Hosts,dc=example,dc=com
+</span><span class='line'>objectclass: organizationalUnit
+</span><span class='line'>objectclass: top
+</span><span class='line'>ou: Hosts&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>正引き&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>dn: ou=example.com,ou=Hosts,dc=example,dc=com
+</span><span class='line'>objectclass: organizationalUnit
+</span><span class='line'>objectclass: top
+</span><span class='line'>ou: example.com&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>dn: relativeDomainName=@,ou=example.com,ou=Hosts,dc=example,dc=com
+</span><span class='line'>dnsclass: IN
+</span><span class='line'>dnsttl: 86400
+</span><span class='line'>nsrecord: ns.example.com.
+</span><span class='line'>objectclass: dNSZone
+</span><span class='line'>objectclass: top
+</span><span class='line'>relativedomainname: @
+</span><span class='line'>soarecord: ns.example.com. root.example.com. 2012110303 28800 14400 3600000
+</span><span class='line'> 86400
+</span><span class='line'>zonename: example.com&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>dn: relativeDomainName=server1,ou=example.com,ou=Hosts,dc=example,dc=com
+</span><span class='line'>arecord: 192.168.1.1
+</span><span class='line'>dnsclass: IN
+</span><span class='line'>dnsttl: 3600
+</span><span class='line'>objectclass: dNSZone
+</span><span class='line'>objectclass: top
+</span><span class='line'>relativedomainname: server1
+</span><span class='line'>zonename: example.com&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>dn: relativeDomainName=www,ou=example.com,ou=Hosts,dc=example,dc=com
+</span><span class='line'>cnamerecord: server1
+</span><span class='line'>dnsclass: IN
+</span><span class='line'>dnsttl: 3600
+</span><span class='line'>objectclass: dNSZone
+</span><span class='line'>objectclass: top
+</span><span class='line'>relativedomainname: www
+</span><span class='line'>zonename: example.com&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>逆引き&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>dn: ou=1.168.192.in-addr.arpa,ou=Hosts,dc=example,dc=com
+</span><span class='line'>objectclass: organizationalUnit
+</span><span class='line'>objectclass: top
+</span><span class='line'>ou: 1.168.192.in-addr.arpa&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>dn: relativeDomainName=@,ou=1.168.192.in-addr.arpa,ou=Hosts,dc=example,dc=com
+</span><span class='line'>arecord: 255.255.255.0
+</span><span class='line'>dnsclass: IN
+</span><span class='line'>dnsttl: 86400
+</span><span class='line'>nsrecord: ns.example.com.
+</span><span class='line'>objectclass: dNSZone
+</span><span class='line'>objectclass: top
+</span><span class='line'>ptrrecord: example.com.
+</span><span class='line'>relativedomainname: @
+</span><span class='line'>soarecord: ns.example.com. root.example.com. 2012110302 28800 14400 3600000
+</span><span class='line'> 86400
+</span><span class='line'>zonename: 1.168.192.in-addr.arpa&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>dn: relativeDomainName=1,ou=1.168.192.in-addr.arpa,ou=Hosts,dc=example,dc=com
+</span><span class='line'>dnsclass: IN
+</span><span class='line'>dnsttl: 3600
+</span><span class='line'>objectclass: dNSZone
+</span><span class='line'>objectclass: top
+</span><span class='line'>ptrrecord: server1.example.com.
+</span><span class='line'>relativedomainname: 1
+</span><span class='line'>zonename: 1.168.192.in-addr.arpa</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 ]]></content>
   </entry>
   
