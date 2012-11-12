@@ -9,8 +9,8 @@
   <meta name="author" content="taishin">
 
   
-  <meta name="description" content="Ubuntu12.04ではresolvconfという仕組みを使うらしい ubuntu 12.04 で resolv.conf が書き換えられる
-DNS in Ubuntu 12.04 /etc/resolvconf/resolv.conf.d/配下のファイルと、/etc/network/ &hellip;">
+  <meta name="description" content="ClousStackのログインをLDAPにするには、APIからコマンドを実行しなければいけないようです。 APIのURL生成がかなりめんどくさいので、生成用のスクリプトを使わせてもらうことにします。
+ここのスクリプトを使おうと思ったんですが、エンコード処理がうまくいかなかったので、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +73,110 @@ DNS in Ubuntu 12.04 /etc/resolvconf/resolv.conf.d/配下のファイルと、/et
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2012/11/12/cloudstack-ldap/">CloudStackへのログインをLDAP認証する</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-12T21:26:00+09:00" pubdate data-updated="true">Nov 12<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/12/cloudstack-ldap/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>ClousStackのログインをLDAPにするには、APIからコマンドを実行しなければいけないようです。</p>
+
+<p>APIのURL生成がかなりめんどくさいので、生成用のスクリプトを使わせてもらうことにします。<br>
+<a href="http://www.creationline.com/blog/asako/1172">ここ</a>のスクリプトを使おうと思ったんですが、エンコード処理がうまくいかなかったので、
+<a href="https://github.com/snumano/CloudStack-API/blob/master/generate-url.pl">ここ</a>のを使わせてもらうことにしました。</p>
+
+<p>まず、</p>
+
+<pre>
+my $site = "http://*.*.*.*/client/api?";
+</pre>
+
+
+<p>の&#8221;*&#8221;を自分のサイトのIPアドレスに変更しておきます。</p>
+
+<p>使い方はこんな感じです。</p>
+
+<pre>
+generate-url.pl -f 3 -u (コマンド) -a (APIキー) -s (Secretキー)
+</pre>
+
+
+<p>コマンドの作り方は、<a href="http://docs.cloudstack.org/CloudStack_Documentation/Administration_Guide%3A_CloudStack">Administrator Guide</a>に書いてあります。</p>
+
+<p>組み合わせるとこんな感じになります。</p>
+
+<pre>
+generate-url.pl -a (APIキー) -s (Secretキー) -f 3 -u "command=ldapConfig&port=389&queryfilter=%28%26%28uid%3D%25u%29%29&searchbase=dc%3Dexample%2Cdc%3Dcom&hostname=(LDAPサーバのIPアドレス)&response=json"
+</pre>
+
+
+<p>成功すると、こんな応答が返ってきます。</p>
+
+<pre>
+{
+   "ldapconfigresponse" : {
+      "ldapconfig" : {
+         "queryfilter" : "(&(uid=%u))",
+         "hostname" : "LDAPサーバのIPアドレス",
+         "port" : "false",
+         "searchbase" : "dc=example,dc=com"
+      }
+   }
+}
+</pre>
+
+
+<p>あと、MD5 hashに関するバグがあるようで、
+<a href="https://cwiki.apache.org/CLOUDSTACK/cloudstack-3x-ldap-authentication.html#Cloudstack3.xLDAPAuthentication-DisablingMD5hash">Cloudstack 3.x LDAP Authentication - Disabling MD5 hash</a>の設定変更が必要になります。</p>
+
+<p>/usr/share/cloud/management/webapps/client/scripts/sharedFunctions.js を</p>
+
+<pre>var md5HashedLogin = false;</pre>
+
+
+<p>に変更し、
+CloudStackの再起動が必要になります。</p>
+
+<pre>service cloud-management restart</pre>
+
+
+<p>あらかじめローカルにユーザを作っておかないといけないようですし、LDAPサーバ障害時を考慮して、adminとか特定のユーザのみローカル認証にするとかもできないようです。</p>
+
+<p>また、なんかトラブルの後、ログインできなくなることが多々あります。
+その場合は、cloud-setup-managementコマンドを実行し、インストールし直すともとのローカル認証でログインできるようになります。(これが問題ないかどうかは分かりません･･･)</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -888,6 +992,10 @@ puts 0</code></pre></noscript></div>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/11/12/cloudstack-ldap/">CloudStackへのログインをLDAP認証する</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/11/12/resolvconf/">Ubuntu 12.04 では /etc/resolv.confが書き換えられる</a>
       </li>
     
@@ -901,10 +1009,6 @@ puts 0</code></pre></noscript></div>
     
       <li class="post">
         <a href="/blog/2012/11/03/octopress/">OctopressをSublime Text 2で操作</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/03/octpressnicommentzhui-jia/">OctpressにComment追加</a>
       </li>
     
   </ul>

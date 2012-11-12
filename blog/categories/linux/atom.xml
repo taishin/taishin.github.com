@@ -4,7 +4,7 @@
   <title><![CDATA[Category: linux | G1BS.0N]]></title>
   <link href="http://taishin.github.com/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2012-11-12T21:26:11+09:00</updated>
+  <updated>2012-11-12T21:28:33+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -12,6 +12,79 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[CloudStackへのログインをLDAP認証する]]></title>
+    <link href="http://taishin.github.com/blog/2012/11/12/cloudstack-ldap/"/>
+    <updated>2012-11-12T21:26:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2012/11/12/cloudstack-ldap</id>
+    <content type="html"><![CDATA[<p>ClousStackのログインをLDAPにするには、APIからコマンドを実行しなければいけないようです。</p>
+
+<p>APIのURL生成がかなりめんどくさいので、生成用のスクリプトを使わせてもらうことにします。<br>
+<a href="http://www.creationline.com/blog/asako/1172">ここ</a>のスクリプトを使おうと思ったんですが、エンコード処理がうまくいかなかったので、
+<a href="https://github.com/snumano/CloudStack-API/blob/master/generate-url.pl">ここ</a>のを使わせてもらうことにしました。</p>
+
+<p>まず、</p>
+
+<pre>
+my $site = "http://*.*.*.*/client/api?";
+</pre>
+
+
+<p>の"*"を自分のサイトのIPアドレスに変更しておきます。</p>
+
+<p>使い方はこんな感じです。</p>
+
+<pre>
+generate-url.pl -f 3 -u (コマンド) -a (APIキー) -s (Secretキー)
+</pre>
+
+
+<p>コマンドの作り方は、<a href="http://docs.cloudstack.org/CloudStack_Documentation/Administration_Guide%3A_CloudStack">Administrator Guide</a>に書いてあります。</p>
+
+<p>組み合わせるとこんな感じになります。</p>
+
+<pre>
+generate-url.pl -a (APIキー) -s (Secretキー) -f 3 -u "command=ldapConfig&port=389&queryfilter=%28%26%28uid%3D%25u%29%29&searchbase=dc%3Dexample%2Cdc%3Dcom&hostname=(LDAPサーバのIPアドレス)&response=json"
+</pre>
+
+
+<p>成功すると、こんな応答が返ってきます。</p>
+
+<pre>
+{
+   "ldapconfigresponse" : {
+      "ldapconfig" : {
+         "queryfilter" : "(&(uid=%u))",
+         "hostname" : "LDAPサーバのIPアドレス",
+         "port" : "false",
+         "searchbase" : "dc=example,dc=com"
+      }
+   }
+}
+</pre>
+
+
+<p>あと、MD5 hashに関するバグがあるようで、
+<a href="https://cwiki.apache.org/CLOUDSTACK/cloudstack-3x-ldap-authentication.html#Cloudstack3.xLDAPAuthentication-DisablingMD5hash">Cloudstack 3.x LDAP Authentication - Disabling MD5 hash</a>の設定変更が必要になります。</p>
+
+<p>/usr/share/cloud/management/webapps/client/scripts/sharedFunctions.js を</p>
+
+<pre>var md5HashedLogin = false;</pre>
+
+
+<p>に変更し、
+CloudStackの再起動が必要になります。</p>
+
+<pre>service cloud-management restart</pre>
+
+
+<p>あらかじめローカルにユーザを作っておかないといけないようですし、LDAPサーバ障害時を考慮して、adminとか特定のユーザのみローカル認証にするとかもできないようです。</p>
+
+<p>また、なんかトラブルの後、ログインできなくなることが多々あります。
+その場合は、cloud-setup-managementコマンドを実行し、インストールし直すともとのローカル認証でログインできるようになります。(これが問題ないかどうかは分かりません･･･)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Ubuntu 12.04 では /etc/resolv.confが書き換えられる]]></title>
