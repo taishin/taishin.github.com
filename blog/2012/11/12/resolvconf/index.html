@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: linux - G1BS.0N</title>
+  <title>Ubuntu 12.04 では /etc/resolv.confが書き換えられる - G1BS.0N</title>
   <meta name="author" content="taishin">
 
   
-  <meta name="description" content="Category: linux">
+  <meta name="description" content="Ubuntu12.04ではresolvconfという仕組みを使うらしい ubuntu 12.04 で resolv.conf が書き換えられる
+DNS in Ubuntu 12.04 /etc/resolvconf/resolv.conf.d/配下のファイルと、/etc/network/ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://taishin.github.comblog/categories/linux/">
+  <link rel="canonical" href="http://taishin.github.com/blog/2012/11/12/resolvconf/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -71,50 +72,118 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Linux</h1>
+    
+      
+        <h1 class="entry-title">Ubuntu 12.04 では /etc/resolv.confが書き換えられる</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-12T21:23:00+09:00" pubdate data-updated="true">Nov 12<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>Ubuntu12.04ではresolvconfという仕組みを使うらしい</p>
 
-  
-  <h2>2012</h2>
-
-<article>
-  
-<h1><a href="/blog/2012/11/12/resolvconf/">Ubuntu 12.04 では /etc/resolv.confが書き換えられる</a></h1>
-<time datetime="2012-11-12T21:23:00+09:00" pubdate><span class='month'>Nov</span> <span class='day'>12</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/linux/'>linux</a></span>
-</footer>
+<ul>
+<li><a href="https://sites.google.com/site/michinobumaeda/hardware-os/ubuntu-12-04-resolv-conf">ubuntu 12.04 で resolv.conf が書き換えられる</a></li>
+<li><a href="http://www.stgraber.org/2012/02/24/dns-in-ubuntu-12-04/">DNS in Ubuntu 12.04</a></li>
+</ul>
 
 
-</article>
+<p>/etc/resolvconf/resolv.conf.d/配下のファイルと、/etc/network/interfacesのdns-nameservers と dns-search から動的に/etc/resolv.confが生成されるようです。</p>
 
+<p>/etc/resolvconf/resolv.conf.d/base に書くのが一般的みたいですが、
+それだと/etc/network/interfaces 「dns-nameservers」 が上に来て優先されるみたいです。</p>
 
+<p>chefで一括管理することを考えると、/etc/network/interfacesにはどう書かれるか分からないので、/etc/resolvconf/resolv.conf.d/headに書く方がいいかもしれないです。</p>
 
-<article>
-  
-<h1><a href="/blog/2012/11/04/bind-plus-openldap/">Bind + OpenLDAP</a></h1>
-<time datetime="2012-11-04T10:18:00+09:00" pubdate><span class='month'>Nov</span> <span class='day'>04</span> <span class='year'>2012</span></time>
+<p>resolv.confに反映させるには、resolvconfサービスの再起動が必要です。</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/linux/'>linux</a></span>
-</footer>
-
-
-</article>
+<pre>service resolvconf restart</pre>
 
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">taishin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-12T21:23:00+09:00" pubdate data-updated="true">Nov 12<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/linux/'>linux</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  <a href="http://b.hatena.ne.jp/entry/http://taishin.github.com/blog/2012/11/12/resolvconf/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://taishin.github.com/blog/2012/11/12/resolvconf/" data-via="taishin" data-counturl="http://taishin.github.com/blog/2012/11/12/resolvconf/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+   
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2012/11/11/zabbixde/" title="Previous Post: Zabbix2.0でESXiのVMごとに監視してみる">&laquo; Zabbix2.0でESXiのVMごとに監視してみる</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -186,7 +255,10 @@
       var disqus_shortname = 'g1bs0n';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://taishin.github.com/blog/2012/11/12/resolvconf/';
+        var disqus_url = 'http://taishin.github.com/blog/2012/11/12/resolvconf/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

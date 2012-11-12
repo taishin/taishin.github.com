@@ -4,7 +4,7 @@
   <title><![CDATA[Category: linux | G1BS.0N]]></title>
   <link href="http://taishin.github.com/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2012-11-12T21:19:29+09:00</updated>
+  <updated>2012-11-12T21:26:11+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -12,6 +12,33 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ubuntu 12.04 では /etc/resolv.confが書き換えられる]]></title>
+    <link href="http://taishin.github.com/blog/2012/11/12/resolvconf/"/>
+    <updated>2012-11-12T21:23:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2012/11/12/resolvconf</id>
+    <content type="html"><![CDATA[<p>Ubuntu12.04ではresolvconfという仕組みを使うらしい</p>
+
+<ul>
+<li><a href="https://sites.google.com/site/michinobumaeda/hardware-os/ubuntu-12-04-resolv-conf">ubuntu 12.04 で resolv.conf が書き換えられる</a></li>
+<li><a href="http://www.stgraber.org/2012/02/24/dns-in-ubuntu-12-04/">DNS in Ubuntu 12.04</a></li>
+</ul>
+
+
+<p>/etc/resolvconf/resolv.conf.d/配下のファイルと、/etc/network/interfacesのdns-nameservers と dns-search から動的に/etc/resolv.confが生成されるようです。</p>
+
+<p>/etc/resolvconf/resolv.conf.d/base に書くのが一般的みたいですが、
+それだと/etc/network/interfaces 「dns-nameservers」 が上に来て優先されるみたいです。</p>
+
+<p>chefで一括管理することを考えると、/etc/network/interfacesにはどう書かれるか分からないので、/etc/resolvconf/resolv.conf.d/headに書く方がいいかもしれないです。</p>
+
+<p>resolv.confに反映させるには、resolvconfサービスの再起動が必要です。</p>
+
+<pre>service resolvconf restart</pre>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Bind + OpenLDAP]]></title>
