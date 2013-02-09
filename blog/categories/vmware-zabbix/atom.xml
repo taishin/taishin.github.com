@@ -4,7 +4,7 @@
   <title><![CDATA[Category: VMware,Zabbix | G1BS.0N]]></title>
   <link href="http://taishin.github.com/blog/categories/vmware-zabbix/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2013-02-09T23:37:52+09:00</updated>
+  <updated>2013-02-09T23:43:05+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Zabbix2.0でESXiのVMごとに監視してみる(2)]]></title>
+    <title type="html"><![CDATA[Zabbix2.0でESXiのVMごとに監視してみる(自動登録編)]]></title>
     <link href="http://taishin.github.com/blog/2013/02/09/zabbixde/"/>
     <updated>2013-02-09T22:01:00+09:00</updated>
     <id>http://taishin.github.com/blog/2013/02/09/zabbixde</id>
