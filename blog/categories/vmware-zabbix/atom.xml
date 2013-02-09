@@ -4,7 +4,7 @@
   <title><![CDATA[Category: VMware,Zabbix | G1BS.0N]]></title>
   <link href="http://taishin.github.com/blog/categories/vmware-zabbix/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2013-02-09T23:43:05+09:00</updated>
+  <updated>2013-02-09T23:46:57+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -22,8 +22,8 @@
 
 <p>あと、登録したホストをマップに展開してホストスクリーンで各VMのステータスが確認できるようにしてみました。</p>
 
-<p><img src="images/zabbix-map.png" width="500"  alt="Zabbix Map">
-<img src="images/zabbix-hostscreen.png" width="500" alt="Zabbix HostScreen"></p>
+<p><img src="http://taishin.github.com/images/zabbix-map.png" width="500"  alt="Zabbix Map">
+<img src="http://taishin.github.com/images/zabbix-hostscreen.png" width="500" alt="Zabbix HostScreen"></p>
 
 <p>コードはこんな感じです。
 <div><script src='https://gist.github.com/4054887.js?file='></script>
