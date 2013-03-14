@@ -4,7 +4,7 @@
   <title><![CDATA[G1BS.0N]]></title>
   <link href="http://taishin.github.com/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2013-03-14T23:33:01+09:00</updated>
+  <updated>2013-03-14T23:40:26+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -22,8 +22,11 @@
 
 <p>インストール手順は、このへん。</p>
 
-<p>http://docs.opscode.com/chef/install_server.html
-http://www.opscode.com/blog/2013/03/11/chef-11-server-up-and-running/</p>
+<ul>
+<li><a href="http://docs.opscode.com/chef/install_server.html">Install Chef Server 11.x</a></li>
+<li><a href="http://www.opscode.com/blog/2013/03/11/chef-11-server-up-and-running/">Chef 11 Server: Up and Running</a></li>
+</ul>
+
 
 <pre>
 $ sudo yum install chef-server-11.0.6-1.el6.x86_64.rpm
@@ -87,11 +90,12 @@ $ export no_proxy=localhost,127.0.0.1
 
 
 <ul>
-<li>/etc/profile.d/proxy.sh
-{% clodeblock %}
-export no_proxy=localhost,127.0.0.1
-{% endcodeblock %}</li>
+<li>/etc/profile.d/proxy.sh</li>
 </ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>export no_proxy=localhost,127.0.0.1</span></code></pre></td></tr></table></div></figure>
 
 
 <p>これで再挑戦</p>
@@ -142,11 +146,13 @@ chef11ではnginxを使うので、Apacheとボートがバッティングして
 </ul>
 
 
-<p>{% codeblock %}
-default[&#8216;chef_server&#8217;][&#8216;nginx&#8217;][&#8216;ssl_port&#8217;] = 443
-default[&#8216;chef_server&#8217;][&#8216;nginx&#8217;][&#8216;enable_non_ssl&#8217;] = false
-default[&#8216;chef_server&#8217;][&#8216;nginx&#8217;][&#8216;non_ssl_port&#8217;] = 8880
-{% endcodeblock %}</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>default['chef_server']['nginx']['ssl_port'] = 443
+</span><span class='line'>default['chef_server']['nginx']['enable_non_ssl'] = false
+</span><span class='line'>default['chef_server']['nginx']['non_ssl_port'] = 8880</span></code></pre></td></tr></table></div></figure>
+
 
 <p>とりあえずnon_ssl_portを80から変更してみました。
 ssl_portも変更したりしてみましたが、うまく動きませんでした。
@@ -174,13 +180,16 @@ chef-server Reconfigured!
 <p>chef-server自信をclient登録します。</p>
 
 <ul>
-<li>/etc/chef/client.rb
-{% codeblock %}
-chef_server_url &#8220;https://chef-server IP&#8221;
-http_proxy &#8220;http://Proxy IP:80&#8221;
-https_proxy &#8220;http://Proxy IP:80&#8221;
-{% endcodeblock %}</li>
+<li>/etc/chef/client.rb</li>
 </ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>chef_server_url "https://chef-server IP"
+</span><span class='line'>http_proxy "http://Proxy IP:80"
+</span><span class='line'>https_proxy "http://Proxy IP:80"</span></code></pre></td></tr></table></div></figure>
 
 
 <p>validation.pemを配置</p>
