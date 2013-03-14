@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: chef | G1BS.0N]]></title>
+  <link href="http://taishin.github.com/blog/categories/chef/atom.xml" rel="self"/>
+  <link href="http://taishin.github.com/"/>
+  <updated>2013-03-14T23:31:00+09:00</updated>
+  <id>http://taishin.github.com/</id>
+  <author>
+    <name><![CDATA[taishin]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Chef Server 11をインストール]]></title>
+    <link href="http://taishin.github.com/blog/2013/03/14/chef11/"/>
+    <updated>2013-03-14T22:53:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2013/03/14/chef11</id>
+    <content type="html"><![CDATA[<p>Chef Server を11.xにしようとしてハマったのでまとめておきます。</p>
+
+<p>インストール手順は、このへん。</p>
+
+<p>http://docs.opscode.com/chef/install_server.html
+http://www.opscode.com/blog/2013/03/11/chef-11-server-up-and-running/</p>
+
+<pre>
+$ sudo yum install chef-server-11.0.6-1.el6.x86_64.rpm
+</pre>
+
+
+<p>それから</p>
+
+<pre>
+$ sudo chef-server-ctl reconfigure
+</pre>
+
+
+<p>失敗します。</p>
+
+<pre>
+Recipe: chef-server::bootstrap
+  * execute[verify-system-status] action run
+================================================================================
+Error executing action `run` on resource 'execute[verify-system-status]'
+================================================================================
+
+
+Mixlib::ShellOut::ShellCommandFailed
+------------------------------------
+Expected process to exit with [0], but received '22'
+---- Begin output of curl -sf http://localhost:8000/_status ----
+STDOUT:
+STDERR:
+---- End output of curl -sf http://localhost:8000/_status ----
+Ran curl -sf http://localhost:8000/_status returned 22
+
+
+(中略)
+
+
+[2013-03-14T14:53:27+09:00] ERROR: Running exception handlers
+[2013-03-14T14:53:27+09:00] ERROR: Exception handlers complete
+Chef Client failed. 110 resources updated
+[2013-03-14T14:53:27+09:00] FATAL: Stacktrace dumped to /opt/chef-server/embedded/cookbooks/cache/chef-stacktrace.out
+[2013-03-14T14:53:27+09:00] FATAL: Mixlib::ShellOut::ShellCommandFailed: execute[verify-system-status] (chef-server::bootstrap line 21) had an error: Mixlib::ShellOut::ShellCommandFailed: Expected process to exit with [0], but received '22'
+---- Begin output of curl -sf http://localhost:8000/_status ----
+STDOUT:
+STDERR:
+---- End output of curl -sf http://localhost:8000/_status ----
+Ran curl -sf http://localhost:8000/_status returned 22
+</pre>
+
+
+<p>何度やっても同じです。
+Ubuntu12.04でもCentOS6.3でも同じでした。</p>
+
+<p><a href="http://tickets.opscode.com/browse/CHEF-3837">ここ</a>みると、DNSとかhostsとかが原因とありますが、どういじっても同じ結果・・・</p>
+
+<p>原因はProxyでした。
+curlがlocalhostもhttp_proxyが適用されてしまってたみたいです。</p>
+
+<pre>
+$ export no_proxy=localhost,127.0.0.1
+</pre>
+
+
+<ul>
+<li>/etc/profile.d/proxy.sh
+{% clodeblock %}
+export no_proxy=localhost,127.0.0.1
+{% endcodeblock %}</li>
+</ul>
+
+
+<p>これで再挑戦</p>
+
+<pre>
+$ sudo chef-server-ctl reconfigure
+</pre>
+
+
+
+
+<pre>
+(略)
+
+Recipe: chef-server::erchef
+  * service[erchef] action restart
+    - restart service service[erchef]
+
+Chef Client finished, 152 resources updated
+chef-server Reconfigured!
+</pre>
+
+
+<p>成功しました！</p>
+
+<p>でも・・・</p>
+
+<pre>
+$ sudo chef-server-ctl tail
+</pre>
+
+
+
+
+<pre>
+==> /var/log/chef-server/nginx/error.log <==
+2013/03/14 15:01:07 [emerg] 8903#0: bind() to 0.0.0.0:80 failed (98: Address already in use)
+</pre>
+
+
+<p>エラーが出てます。
+chef11ではnginxを使うので、Apacheとボートがバッティングしてるようです。</p>
+
+<p>chefのattributeを変更します。</p>
+
+<ul>
+<li>/opt/chef-server/embedded/cookbooks/chef-server/attributes/default.rb</li>
+</ul>
+
+
+<p>{% codeblock %}
+default['chef_server']['nginx']['ssl_port'] = 443
+default['chef_server']['nginx']['enable_non_ssl'] = false
+default['chef_server']['nginx']['non_ssl_port'] = 8880
+{% endcodeblock %}</p>
+
+<p>とりあえずnon_ssl_portを80から変更してみました。
+ssl_portも変更したりしてみましたが、うまく動きませんでした。
+とりあえず、80番ポートは既存のApacheで、443はchef-serverのnginxで動かすことにしました。</p>
+
+<p>再実行</p>
+
+<pre>
+$ sudo chef-server-ctl reconfigure
+</pre>
+
+
+
+
+<pre>
+Recipe: chef-server::nginx
+  * service[nginx] action restart
+    - restart service service[nginx]
+
+Chef Client finished, 5 resources updated
+chef-server Reconfigured!
+</pre>
+
+
+<p>chef-server自信をclient登録します。</p>
+
+<ul>
+<li>/etc/chef/client.rb
+{% codeblock %}
+chef_server_url "https://chef-server IP"
+http_proxy "http://Proxy IP:80"
+https_proxy "http://Proxy IP:80"
+{% endcodeblock %}</li>
+</ul>
+
+
+<p>validation.pemを配置</p>
+
+<pre>
+cp /etc/chef-server/chef-validator.pem /etc/chef/validation.pem
+</pre>
+
+
+<p>chef-clientを実行</p>
+
+<pre>
+# chef-client
+Starting Chef Client, version 11.4.0
+Creating a new client identity for helios.jkcloud.org using the validator key.
+resolving cookbooks for run list: []
+Synchronizing Cookbooks:
+Compiling Cookbooks...
+[2013-03-14T15:38:52+09:00] WARN: Node host.domain has an empty run list.
+Converging 0 resources
+Chef Client finished, 0 resources updated
+</pre>
+
+
+
+]]></content>
+  </entry>
+  
+</feed>
