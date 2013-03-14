@@ -9,7 +9,8 @@
   <meta name="author" content="taishin">
 
   
-  <meta name="description" content="前回のやつは、データは自動で取ってくるけど、Zabbixへのホスト登録は手動でやらないといけなかったので、いまいちでした。なので、ZabbixのAPIを使って、自動登録するように変更しました。また、1日データが取得できなかったら、Zabbixから削除するようにしました。 あと、 &hellip;">
+  <meta name="description" content="Chef Server を11.xにしようとしてハマったのでまとめておきます。 インストール手順は、このへん。 http://docs.opscode.com/chef/install_server.html
+http://www.opscode.com/blog/2013/03/11/chef- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -72,6 +73,233 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/03/14/chef11/">Chef Server 11をインストール</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-14T22:53:00+09:00" pubdate data-updated="true">Mar 14<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/03/14/chef11/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Chef Server を11.xにしようとしてハマったのでまとめておきます。</p>
+
+<p>インストール手順は、このへん。</p>
+
+<p>http://docs.opscode.com/chef/install_server.html
+http://www.opscode.com/blog/2013/03/11/chef-11-server-up-and-running/</p>
+
+<pre>
+$ sudo yum install chef-server-11.0.6-1.el6.x86_64.rpm
+</pre>
+
+
+<p>それから</p>
+
+<pre>
+$ sudo chef-server-ctl reconfigure
+</pre>
+
+
+<p>失敗します。</p>
+
+<pre>
+Recipe: chef-server::bootstrap
+  * execute[verify-system-status] action run
+================================================================================
+Error executing action `run` on resource 'execute[verify-system-status]'
+================================================================================
+
+
+Mixlib::ShellOut::ShellCommandFailed
+------------------------------------
+Expected process to exit with [0], but received '22'
+---- Begin output of curl -sf http://localhost:8000/_status ----
+STDOUT:
+STDERR:
+---- End output of curl -sf http://localhost:8000/_status ----
+Ran curl -sf http://localhost:8000/_status returned 22
+
+
+(中略)
+
+
+[2013-03-14T14:53:27+09:00] ERROR: Running exception handlers
+[2013-03-14T14:53:27+09:00] ERROR: Exception handlers complete
+Chef Client failed. 110 resources updated
+[2013-03-14T14:53:27+09:00] FATAL: Stacktrace dumped to /opt/chef-server/embedded/cookbooks/cache/chef-stacktrace.out
+[2013-03-14T14:53:27+09:00] FATAL: Mixlib::ShellOut::ShellCommandFailed: execute[verify-system-status] (chef-server::bootstrap line 21) had an error: Mixlib::ShellOut::ShellCommandFailed: Expected process to exit with [0], but received '22'
+---- Begin output of curl -sf http://localhost:8000/_status ----
+STDOUT:
+STDERR:
+---- End output of curl -sf http://localhost:8000/_status ----
+Ran curl -sf http://localhost:8000/_status returned 22
+</pre>
+
+
+<p>何度やっても同じです。
+Ubuntu12.04でもCentOS6.3でも同じでした。</p>
+
+<p><a href="http://tickets.opscode.com/browse/CHEF-3837">ここ</a>みると、DNSとかhostsとかが原因とありますが、どういじっても同じ結果・・・</p>
+
+<p>原因はProxyでした。
+curlがlocalhostもhttp_proxyが適用されてしまってたみたいです。</p>
+
+<pre>
+$ export no_proxy=localhost,127.0.0.1
+</pre>
+
+
+<ul>
+<li>/etc/profile.d/proxy.sh
+{% clodeblock %}
+export no_proxy=localhost,127.0.0.1
+{% endcodeblock %}</li>
+</ul>
+
+
+<p>これで再挑戦</p>
+
+<pre>
+$ sudo chef-server-ctl reconfigure
+</pre>
+
+
+
+
+<pre>
+(略)
+
+Recipe: chef-server::erchef
+  * service[erchef] action restart
+    - restart service service[erchef]
+
+Chef Client finished, 152 resources updated
+chef-server Reconfigured!
+</pre>
+
+
+<p>成功しました！</p>
+
+<p>でも・・・</p>
+
+<pre>
+$ sudo chef-server-ctl tail
+</pre>
+
+
+
+
+<pre>
+==> /var/log/chef-server/nginx/error.log <==
+2013/03/14 15:01:07 [emerg] 8903#0: bind() to 0.0.0.0:80 failed (98: Address already in use)
+</pre>
+
+
+<p>エラーが出てます。
+chef11ではnginxを使うので、Apacheとボートがバッティングしてるようです。</p>
+
+<p>chefのattributeを変更します。</p>
+
+<ul>
+<li>/opt/chef-server/embedded/cookbooks/chef-server/attributes/default.rb</li>
+</ul>
+
+
+<p>{% codeblock %}
+default[&#8216;chef_server&#8217;][&#8216;nginx&#8217;][&#8216;ssl_port&#8217;] = 443
+default[&#8216;chef_server&#8217;][&#8216;nginx&#8217;][&#8216;enable_non_ssl&#8217;] = false
+default[&#8216;chef_server&#8217;][&#8216;nginx&#8217;][&#8216;non_ssl_port&#8217;] = 8880
+{% endcodeblock %}</p>
+
+<p>とりあえずnon_ssl_portを80から変更してみました。
+ssl_portも変更したりしてみましたが、うまく動きませんでした。
+とりあえず、80番ポートは既存のApacheで、443はchef-serverのnginxで動かすことにしました。</p>
+
+<p>再実行</p>
+
+<pre>
+$ sudo chef-server-ctl reconfigure
+</pre>
+
+
+
+
+<pre>
+Recipe: chef-server::nginx
+  * service[nginx] action restart
+    - restart service service[nginx]
+
+Chef Client finished, 5 resources updated
+chef-server Reconfigured!
+</pre>
+
+
+<p>chef-server自信をclient登録します。</p>
+
+<ul>
+<li>/etc/chef/client.rb
+{% codeblock %}
+chef_server_url &#8220;https://chef-server IP&#8221;
+http_proxy &#8220;http://Proxy IP:80&#8221;
+https_proxy &#8220;http://Proxy IP:80&#8221;
+{% endcodeblock %}</li>
+</ul>
+
+
+<p>validation.pemを配置</p>
+
+<pre>
+cp /etc/chef-server/chef-validator.pem /etc/chef/validation.pem
+</pre>
+
+
+<p>chef-clientを実行</p>
+
+<pre>
+# chef-client
+Starting Chef Client, version 11.4.0
+Creating a new client identity for helios.jkcloud.org using the validator key.
+resolving cookbooks for run list: []
+Synchronizing Cookbooks:
+Compiling Cookbooks...
+[2013-03-14T15:38:52+09:00] WARN: Node host.domain has an empty run list.
+Converging 0 resources
+Chef Client finished, 0 resources updated
+</pre>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1095,58 +1323,9 @@ puts 0</code></pre></noscript></div>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
-        <h1 class="entry-title"><a href="/blog/2012/11/02/tou-gao-tesuto/">Github+Octopress導入</a></h1>
-      
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-02T22:19:00+09:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/02/tou-gao-tesuto/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><ul>
-<li><a href="http://octopress.org/docs/">http://octopress.org/docs/</a></li>
-<li><a href="http://www.hisasann.com/blog/2012/10/06/first-post/">http://www.hisasann.com/blog/2012/10/06/first-post/</a></li>
-<li><a href="http://shogo82148.github.com/blog/2012/03/21/test/">http://shogo82148.github.com/blog/2012/03/21/test/</a></li>
-<li><a href="http://mizchi.github.com/blog/2012/09/22/octopress-memo/">http://mizchi.github.com/blog/2012/09/22/octopress-memo/</a>
-
-<ul>
-<li>zshの問題とかも</li>
-</ul>
-</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/2/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -1157,6 +1336,10 @@ puts 0</code></pre></noscript></div>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/03/14/chef11/">Chef Server 11をインストール</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/02/09/zabbixde/">Zabbix2.0でESXiのVMごとに監視してみる(自動登録編)</a>
@@ -1172,10 +1355,6 @@ puts 0</code></pre></noscript></div>
     
       <li class="post">
         <a href="/blog/2012/11/11/zabbixde/">Zabbix2.0でESXiのVMごとに監視してみる</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/04/bind-plus-openldap/">Bind + OpenLDAP</a>
       </li>
     
   </ul>

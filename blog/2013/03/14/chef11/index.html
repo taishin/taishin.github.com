@@ -1,0 +1,477 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Chef Server 11をインストール - G1BS.0N</title>
+  <meta name="author" content="taishin">
+
+  
+  <meta name="description" content="Chef Server を11.xにしようとしてハマったのでまとめておきます。 インストール手順は、このへん。 http://docs.opscode.com/chef/install_server.html
+http://www.opscode.com/blog/2013/03/11/chef- &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://taishin.github.com/blog/2013/03/14/chef11/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="G1BS.0N" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">87</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">G1BS.0N</a></h1>
+  
+    <h2>Tech Memo</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:taishin.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Chef Server 11をインストール</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-14T22:53:00+09:00" pubdate data-updated="true">Mar 14<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Chef Server を11.xにしようとしてハマったのでまとめておきます。</p>
+
+<p>インストール手順は、このへん。</p>
+
+<p>http://docs.opscode.com/chef/install_server.html
+http://www.opscode.com/blog/2013/03/11/chef-11-server-up-and-running/</p>
+
+<pre>
+$ sudo yum install chef-server-11.0.6-1.el6.x86_64.rpm
+</pre>
+
+
+<p>それから</p>
+
+<pre>
+$ sudo chef-server-ctl reconfigure
+</pre>
+
+
+<p>失敗します。</p>
+
+<pre>
+Recipe: chef-server::bootstrap
+  * execute[verify-system-status] action run
+================================================================================
+Error executing action `run` on resource 'execute[verify-system-status]'
+================================================================================
+
+
+Mixlib::ShellOut::ShellCommandFailed
+------------------------------------
+Expected process to exit with [0], but received '22'
+---- Begin output of curl -sf http://localhost:8000/_status ----
+STDOUT:
+STDERR:
+---- End output of curl -sf http://localhost:8000/_status ----
+Ran curl -sf http://localhost:8000/_status returned 22
+
+
+(中略)
+
+
+[2013-03-14T14:53:27+09:00] ERROR: Running exception handlers
+[2013-03-14T14:53:27+09:00] ERROR: Exception handlers complete
+Chef Client failed. 110 resources updated
+[2013-03-14T14:53:27+09:00] FATAL: Stacktrace dumped to /opt/chef-server/embedded/cookbooks/cache/chef-stacktrace.out
+[2013-03-14T14:53:27+09:00] FATAL: Mixlib::ShellOut::ShellCommandFailed: execute[verify-system-status] (chef-server::bootstrap line 21) had an error: Mixlib::ShellOut::ShellCommandFailed: Expected process to exit with [0], but received '22'
+---- Begin output of curl -sf http://localhost:8000/_status ----
+STDOUT:
+STDERR:
+---- End output of curl -sf http://localhost:8000/_status ----
+Ran curl -sf http://localhost:8000/_status returned 22
+</pre>
+
+
+<p>何度やっても同じです。
+Ubuntu12.04でもCentOS6.3でも同じでした。</p>
+
+<p><a href="http://tickets.opscode.com/browse/CHEF-3837">ここ</a>みると、DNSとかhostsとかが原因とありますが、どういじっても同じ結果・・・</p>
+
+<p>原因はProxyでした。
+curlがlocalhostもhttp_proxyが適用されてしまってたみたいです。</p>
+
+<pre>
+$ export no_proxy=localhost,127.0.0.1
+</pre>
+
+
+<ul>
+<li>/etc/profile.d/proxy.sh
+{% clodeblock %}
+export no_proxy=localhost,127.0.0.1
+{% endcodeblock %}</li>
+</ul>
+
+
+<p>これで再挑戦</p>
+
+<pre>
+$ sudo chef-server-ctl reconfigure
+</pre>
+
+
+
+
+<pre>
+(略)
+
+Recipe: chef-server::erchef
+  * service[erchef] action restart
+    - restart service service[erchef]
+
+Chef Client finished, 152 resources updated
+chef-server Reconfigured!
+</pre>
+
+
+<p>成功しました！</p>
+
+<p>でも・・・</p>
+
+<pre>
+$ sudo chef-server-ctl tail
+</pre>
+
+
+
+
+<pre>
+==> /var/log/chef-server/nginx/error.log <==
+2013/03/14 15:01:07 [emerg] 8903#0: bind() to 0.0.0.0:80 failed (98: Address already in use)
+</pre>
+
+
+<p>エラーが出てます。
+chef11ではnginxを使うので、Apacheとボートがバッティングしてるようです。</p>
+
+<p>chefのattributeを変更します。</p>
+
+<ul>
+<li>/opt/chef-server/embedded/cookbooks/chef-server/attributes/default.rb</li>
+</ul>
+
+
+<p>{% codeblock %}
+default[&#8216;chef_server&#8217;][&#8216;nginx&#8217;][&#8216;ssl_port&#8217;] = 443
+default[&#8216;chef_server&#8217;][&#8216;nginx&#8217;][&#8216;enable_non_ssl&#8217;] = false
+default[&#8216;chef_server&#8217;][&#8216;nginx&#8217;][&#8216;non_ssl_port&#8217;] = 8880
+{% endcodeblock %}</p>
+
+<p>とりあえずnon_ssl_portを80から変更してみました。
+ssl_portも変更したりしてみましたが、うまく動きませんでした。
+とりあえず、80番ポートは既存のApacheで、443はchef-serverのnginxで動かすことにしました。</p>
+
+<p>再実行</p>
+
+<pre>
+$ sudo chef-server-ctl reconfigure
+</pre>
+
+
+
+
+<pre>
+Recipe: chef-server::nginx
+  * service[nginx] action restart
+    - restart service service[nginx]
+
+Chef Client finished, 5 resources updated
+chef-server Reconfigured!
+</pre>
+
+
+<p>chef-server自信をclient登録します。</p>
+
+<ul>
+<li>/etc/chef/client.rb
+{% codeblock %}
+chef_server_url &#8220;https://chef-server IP&#8221;
+http_proxy &#8220;http://Proxy IP:80&#8221;
+https_proxy &#8220;http://Proxy IP:80&#8221;
+{% endcodeblock %}</li>
+</ul>
+
+
+<p>validation.pemを配置</p>
+
+<pre>
+cp /etc/chef-server/chef-validator.pem /etc/chef/validation.pem
+</pre>
+
+
+<p>chef-clientを実行</p>
+
+<pre>
+# chef-client
+Starting Chef Client, version 11.4.0
+Creating a new client identity for helios.jkcloud.org using the validator key.
+resolving cookbooks for run list: []
+Synchronizing Cookbooks:
+Compiling Cookbooks...
+[2013-03-14T15:38:52+09:00] WARN: Node host.domain has an empty run list.
+Converging 0 resources
+Chef Client finished, 0 resources updated
+</pre>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">taishin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-14T22:53:00+09:00" pubdate data-updated="true">Mar 14<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/chef/'>chef</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  <a href="http://b.hatena.ne.jp/entry/http://taishin.github.com/blog/2013/03/14/chef11/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://taishin.github.com/blog/2013/03/14/chef11/" data-via="taishin" data-counturl="http://taishin.github.com/blog/2013/03/14/chef11/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+   
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/02/09/zabbixde/" title="Previous Post: Zabbix2.0でESXiのVMごとに監視してみる(自動登録編)">&laquo; Zabbix2.0でESXiのVMごとに監視してみる(自動登録編)</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/03/14/chef11/">Chef Server 11をインストール</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/09/zabbixde/">Zabbix2.0でESXiのVMごとに監視してみる(自動登録編)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/12/cloudstack-ldap/">CloudStackへのログインをLDAP認証する</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/12/resolvconf/">Ubuntu 12.04 では /etc/resolv.confが書き換えられる</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/11/zabbixde/">Zabbix2.0でESXiのVMごとに監視してみる</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("taishin", 0, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/taishin" class="twitter-follow-button" data-show-count="false">Follow @taishin</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - taishin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'g1bs0n';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://taishin.github.com/blog/2013/03/14/chef11/';
+        var disqus_url = 'http://taishin.github.com/blog/2013/03/14/chef11/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
