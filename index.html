@@ -9,8 +9,7 @@
   <meta name="author" content="taishin">
 
   
-  <meta name="description" content="Chef Server を11.xにしようとしてハマったのでまとめておきます。 インストール手順は、このへん。 Install Chef Server 11.x
-Chef 11 Server: Up and Running $ sudo yum install chef-server-11.0.6 &hellip;">
+  <meta name="description" content="CloudStackで仮想マシンを立ち上げると、ドメイン名が「cs1cloud.internal」というドメインになります。 これを変えるには、WebUIのグローバル設定で「guest.domain.suffix」を変更すればいいはずなのですが、なんか変わりません。 ここにあるように、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,57 @@ Chef 11 Server: Up and Running $ sudo yum install chef-server-11.0.6 &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2013/03/17/cs-domain/">CloudStackのドメインを変更する</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-17T10:20:00+09:00" pubdate data-updated="true">Mar 17<span>th</span>, 2013</time>
+        
+         | <a href="/blog/2013/03/17/cs-domain/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>CloudStackで仮想マシンを立ち上げると、ドメイン名が「cs1cloud.internal」というドメインになります。</p>
+
+<p>これを変えるには、WebUIのグローバル設定で「guest.domain.suffix」を変更すればいいはずなのですが、なんか変わりません。</p>
+
+<p><a href="http://buildacloud.org/forum/storage-and-networking/8732-virtual-router-domain-configuration.html">ここ</a>にあるように、DBに直接変更しないと有効にならないみたいです。</p>
+
+<pre>
+UPDATE networks SET network_domain='cloud.mydomain.com' WHERE traffic_type='Guest';
+</pre>
+
+
+<p>あと、ここで指定したドメインは、仮想ルータのdnsmasqでは名前解決できないみたいなので、サブドメインにするとか、今使っているドメイン以外を指定したほうがいいみたいです。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1292,46 +1342,6 @@ puts 0</code></pre></noscript></div>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
-        <h1 class="entry-title"><a href="/blog/2012/11/02/octopresstema/">Octopressテーマ</a></h1>
-      
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-11-02T23:49:00+09:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
-        
-         | <a href="/blog/2012/11/02/octopresstema/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="https://github.com/imathis/octopress/wiki/3rd-Party-Octopress-Themes">https://github.com/imathis/octopress/wiki/3rd-Party-Octopress-Themes</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -1347,6 +1357,10 @@ puts 0</code></pre></noscript></div>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/03/17/cs-domain/">CloudStackのドメインを変更する</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/03/14/chef11/">Chef Server 11をインストール</a>
       </li>
     
@@ -1360,10 +1374,6 @@ puts 0</code></pre></noscript></div>
     
       <li class="post">
         <a href="/blog/2012/11/12/resolvconf/">Ubuntu 12.04 では /etc/resolv.confが書き換えられる</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/11/zabbixde/">Zabbix2.0でESXiのVMごとに監視してみる</a>
       </li>
     
   </ul>

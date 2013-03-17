@@ -4,7 +4,7 @@
   <title><![CDATA[G1BS.0N]]></title>
   <link href="http://taishin.github.com/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2013-03-14T23:40:26+09:00</updated>
+  <updated>2013-03-17T10:32:20+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -12,6 +12,26 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[CloudStackのドメインを変更する]]></title>
+    <link href="http://taishin.github.com/blog/2013/03/17/cs-domain/"/>
+    <updated>2013-03-17T10:20:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2013/03/17/cs-domain</id>
+    <content type="html"><![CDATA[<p>CloudStackで仮想マシンを立ち上げると、ドメイン名が「cs1cloud.internal」というドメインになります。</p>
+
+<p>これを変えるには、WebUIのグローバル設定で「guest.domain.suffix」を変更すればいいはずなのですが、なんか変わりません。</p>
+
+<p><a href="http://buildacloud.org/forum/storage-and-networking/8732-virtual-router-domain-configuration.html">ここ</a>にあるように、DBに直接変更しないと有効にならないみたいです。</p>
+
+<pre>
+UPDATE networks SET network_domain='cloud.mydomain.com' WHERE traffic_type='Guest';
+</pre>
+
+
+<p>あと、ここで指定したドメインは、仮想ルータのdnsmasqでは名前解決できないみたいなので、サブドメインにするとか、今使っているドメイン以外を指定したほうがいいみたいです。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Chef Server 11をインストール]]></title>
