@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Zabbix | G1BS.0N]]></title>
+  <title><![CDATA[Category: zabbix | G1BS.0N]]></title>
   <link href="http://taishin.github.com/blog/categories/zabbix/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2013-03-17T10:32:20+09:00</updated>
+  <updated>2013-04-20T23:20:01+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -14,248 +14,25 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Zabbix2.0でESXiのVMごとに監視してみる]]></title>
-    <link href="http://taishin.github.com/blog/2012/11/11/zabbixde/"/>
-    <updated>2012-11-11T14:03:00+09:00</updated>
-    <id>http://taishin.github.com/blog/2012/11/11/zabbixde</id>
-    <content type="html"><![CDATA[<p>vSphere APIを使えば、ESXiだけじゃなくて、VMごとのCPU、メモリなんかのステータスも取得てきます。
-取得した値をZabbixに食わせて、Zabbixで監視してみます。
-VMwareのサイトにPerlのSDKがありますが、書き方が分かりにくかったので、
-今回はRubyのRbVmomiを使ってみます。</p>
+    <title type="html"><![CDATA[ThinReportsでZabbixのレポートを作成]]></title>
+    <link href="http://taishin.github.com/blog/2013/04/20/zabbix-report/"/>
+    <updated>2013-04-20T22:45:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2013/04/20/zabbix-report</id>
+    <content type="html"><![CDATA[<p>Zabbixのスクリーン機能で、グラフの一覧表示なんかはできますが、
+やっぱり提出用レポートとしては厳しいかと。</p>
 
-<p><a href="https://github.com/rlane/rbvmomi">RbVmomi</a></p>
+<p>WordやExcelで毎回作るのもそれは手間だなーと思ってたら
+<a href="http://www.thinreports.org/">ThinReports</a>というものを知ったので、
+これで自動でレポート作れるようにしてみました。</p>
 
-<p>まずはインストール</p>
+<p><a href="https://github.com/taishin/zabbxi_report">zabbix_report</a></p>
 
-<p><code>
-gem install rbvmomi
-</code></p>
+<p>表紙付きでいい感じにできました。
+これはなかなかいいですね。</p>
 
-<p>使い方
-<code>ruby
-require 'rbvmomi'
-</code>
-これでステータスが取れます。簡単です。<br>
-取得する値は、
-<a href="http://pubs.vmware.com/vsphere-51/index.jsp?topic=%2Fcom.vmware.wssdk.apiref.doc%2Fright-pane.html">VMware vSphere API Reference Documentation</a>
-とか https://(vCenter)/mob
-を参照します。</p>
+<p>強いて言えば、出力がPDFなので、WordやExcelでできたら、細かいとこ修正できていいんですが・・・</p>
 
-<p>Zabbixへの取込み方は、
-<a href="http://www.zabbix.com/forum/showthread.php?t=15691">ESXi 4.0 Hardware and Software Monitoring VMWare </a>
-を参考にして、</p>
-
-<blockquote><ol>
-<li>取得した値をローカルにテキストで保存する</li>
-<li>それをZabbix AgentのUserParameterで取得する</li>
-</ol>
-</blockquote>
-
-<p>というやり方にしてみます。<br>
-上記のサイトでは１つのファイルにしていますが、VMごとに取得したいので、
-ついでに、ESXi、データストアのステータスも取得したいと思います。<br>
-VM、ESXi、データストアそれぞれをZabbixに監視ホストとして登録しようと思うので、それぞれ別ファイルにしてみます。</p>
-
-<h2>RbVmomiスクリプト</h2>
-
-<p>で、スクリプトはこんな感じになりました。</p>
-
-<p><div><script src='https://gist.github.com/4054887.js?file='></script>
-<noscript><pre><code>#!/usr/bin/ruby
-
-require 'rubygems'	
-require 'rbvmomi'
-require 'pp'
-
-
-filepath = &quot;/tmp/vsphere/&quot;
-
-begin
-vim = RbVmomi::VIM.connect :host =&gt; ARGV[0], :user =&gt; ARGV[1], :password =&gt; ARGV[2], :insecure =&gt; true
-rescue =&gt; exc
-p exc
-exit
-end
-
-#
-# cennect datacenter
-#
-begin
-dc = vim.serviceInstance.find_datacenter
-rescue =&gt; exc
-p exc
-exit
-end
-
-#
-# get Host state
-#
-
-host = dc.hostFolder.children.first.host.grep(RbVmomi::VIM::HostSystem).each do |h|
-
-host = h.name.gsub(/:/,&quot;-&quot;)
-begin
-hfile = open(filepath + &quot;h_&quot; + host, &quot;w&quot;)
-rescue =&gt; exc
-p exc
-exit
-end
-hfile.print &quot;host-Hostname:&quot;, h.name, &quot;\n&quot;
-hfile.print &quot;host-Product:&quot;, h.summary.config.product.fullName, &quot;\n&quot;
-hfile.print &quot;host-HardwareMode:&quot;, h.summary.hardware.model, &quot;\n&quot;
-hfile.print &quot;host-CPUModel:&quot;, h.summary.hardware.cpuModel, &quot;\n&quot;
-hfile.print &quot;host-CPUMHz:&quot;, h.summary.hardware.cpuMhz, &quot;\n&quot;
-hfile.print &quot;host-CPUCore:&quot;, h.summary.hardware.numCpuCores, &quot;\n&quot;
-hfile.print &quot;host-CPUUsage:&quot;, h.summary.quickStats.overallCpuUsage, &quot;\n&quot;
-hfile.print &quot;host-TotalMemorySize:&quot;, h.summary.hardware.memorySize/1024/1024, &quot;\n&quot;
-hfile.print &quot;host-MemoryUsage:&quot;, h.summary.quickStats.overallMemoryUsage, &quot;\n&quot;
-hfile.print &quot;host-PowerState:&quot;, h.summary.runtime.powerState, &quot;\n&quot;
-hfile.print &quot;host-MaintenanceMode:&quot;, h.summary.runtime.inMaintenanceMode, &quot;\n&quot;
-   hfile.print &quot;host-Uptime:&quot;, h.summary.quickStats.uptime, &quot;\n&quot;
-hfile.close
-end
-
-#
-# get Datastore status
-#
-datastore = dc.datastore.grep(RbVmomi::VIM::Datastore).each do |d|
-ds = d.name.gsub(/:/,&quot;-&quot;)
-begin
-dfile = open(filepath + &quot;d_&quot; + ds, &quot;w&quot;)
-rescue =&gt; exc
-p exc
-exit
-end
-dfile.print &quot;ds-Name:&quot;, d.name, &quot;\n&quot;
-dfile.print &quot;ds-Capacity:&quot;, d.summary.capacity, &quot;\n&quot;
-dfile.print &quot;ds-FreeSpace:&quot;, d.summary.freeSpace, &quot;\n&quot;
-dfile.print &quot;ds-VM:&quot;
-vm = d.vm.grep(RbVmomi::VIM::VirtualMachine).each do |v|
-dfile.print &quot;\&quot;&quot;, v.name, &quot;\&quot;&quot;, &quot; &quot;
-end
-dfile.print &quot;\n&quot;
-dfile.close
-end
-
-#
-# get VirtualMachin status
-#
-vs = dc.vmFolder.childEntity.grep(RbVmomi::VIM::VirtualMachine).each do |v|
-vm = v.name.gsub(/:/,&quot;-&quot;)
-begin
-vfile = open(filepath + &quot;v_&quot; + vm, &quot;w&quot;)
-rescue
-p exc
-exit
-end
-vfile.print &quot;vm-Name:&quot;, v.name, &quot;\n&quot;
-vfile.print &quot;vm-ESXi:&quot;, v.runtime.host.name, &quot;\n&quot;
-vfile.print &quot;vm-powerState:&quot;, v.summary.runtime.powerState, &quot;\n&quot;
-vfile.print &quot;vm-guestFullName:&quot;, v.summary.guest.guestFullName, &quot;\n&quot;
-vfile.print &quot;vm-HostName:&quot;, v.summary.guest.hostName, &quot;\n&quot;
-vfile.print &quot;vm-IPAddress:&quot;, v.summary.guest.ipAddress, &quot;\n&quot;
-vfile.print &quot;vm-VMwareTools:&quot;, v.summary.guest.toolsStatus, &quot;\n&quot;
-vfile.print &quot;vm-maxCpuUsage:&quot;, v.summary.runtime.maxCpuUsage, &quot;\n&quot;
-vfile.print &quot;vm-numCpu:&quot;, v.summary.config.numCpu, &quot;\n&quot;
-vfile.print &quot;vm-overallCpuUsage:&quot;, v.summary.quickStats.overallCpuUsage, &quot;\n&quot;
-vfile.print &quot;vm-memorySizeMB:&quot;, v.summary.config.memorySizeMB, &quot;\n&quot;
-vfile.print &quot;vm-hostMemoryUsage:&quot;, v.summary.quickStats.hostMemoryUsage, &quot;\n&quot;
-vfile.print &quot;vm-guestMemoryUsage:&quot;, v.summary.quickStats.guestMemoryUsage, &quot;\n&quot;
-vfile.print &quot;vm-UncommittedStorage:&quot;, v.summary.storage.uncommitted, &quot;\n&quot;
-vfile.print &quot;vm-UsedStorage:&quot;, v.summary.storage.committed, &quot;\n&quot;
-vfile.print &quot;vm-UnsharedStorage:&quot;, v.summary.storage.unshared, &quot;\n&quot;
-vfile.print &quot;vm-Uptime:&quot;, v.summary.quickStats.uptimeSeconds, &quot;\n&quot;
-vfile.close
-end
-
-puts 0</code></pre></noscript></div>
-</p>
-
-<p>/tmp/vsphere にファイルを保存するのdで、zabbixの実行ユーザに書き込み権を与えておきます。</p>
-
-<pre>chown zabbix:zabbix /var/vsphere</pre>
-
-
-<p>引数にvCenter(or ESXi)のIPアドレス、ユーザ名、パスワードを指定して実行します。</p>
-
-<pre>su -u zabbix rbvmomi-zabbix.rb 192.168.1.1 root password</pre>
-
-
-<p>成功すれば、/tmp/vspere以下にESXi、データストア、VMごとのファイルができます。</p>
-
-<h2>Zabbix設定</h2>
-
-<p>次はZabbix側です。</p>
-
-<p>まず、APIからのデータ取得は結構時間がかかるので、サーバ側、エージェント側両方のタイムアウトを30秒にして、再起動しておきます。</p>
-
-<ul>
-<li><p>/etc/zabbix/zabbix_server.conf
-<code>
-Timeout=30
-</code></p></li>
-<li><p>/etc/zabbix/zabbix_agentd.conf
-<code>
-TImeout=30
-</code></p></li>
-</ul>
-
-
-<p>テンプレートをインポートします。</p>
-
-<ul>
-<li><a href="https://github.com/taishin/rbvmoni-zabbix/blob/master/Template-vCenter.xml">vCenter用</a></li>
-<li><a href="https://github.com/taishin/rbvmoni-zabbix/blob/master/Template-vSphere-ESXi.xml">ESXi用</a></li>
-<li><a href="https://github.com/taishin/rbvmoni-zabbix/blob/master/Template-vSphere-Datastore.xml">データストア用</a></li>
-<li><a href="https://github.com/taishin/rbvmoni-zabbix/blob/master/Template-vSphere-VM.xml">VM用</a></li>
-</ul>
-
-
-<h2>Zabbix UserParameterの設定</h2>
-
-<p>下記のファイルを/etc/zabbix/zabbix_agentd.d/以下に保存します。</p>
-
-<ul>
-<li><a href="https://github.com/taishin/rbvmoni-zabbix/blob/master/userparameter_vsphere-vm.conf">userparameter_vsphere-vm.conf</a></li>
-</ul>
-
-
-<h2>vCenterの登録</h2>
-
-<p>Zabbixにホストとして、vCenterを登録します。</p>
-
-<pre>
-ホスト
-- ホスト名：適当
-- エージェントのIPアドレス：127.0.0.1
-- ポート：10050
-
-テンプレート
-- インポートしたvCenter用テンプレート
-
-マクロ
-- {$HOST} : IPアドレス
-- {$USERNAME} : ユーザ名
-- {$PASSWORD} ： パスワード
-</pre>
-
-
-<p>これで、スクリプトが設定した間隔で実行されます。</p>
-
-<h2>ESXi、データストア、VMの登録</h2>
-
-<pre>
-ホスト
-- ホスト：各登録名
-- IPアドレス：127.0.0.1
-- ポート：10050
-
-テンプレート
-- インポートしたESXi、データストア、VM用テンプレート
-</pre>
-
-
-<p>名前に「:」が含まれていると、登録できないので、「-」に変換して登録してください。</p>
+<p><img class="left" src="/images/zabbix_report.png"></p>
 ]]></content>
   </entry>
   

@@ -9,8 +9,7 @@
   <meta name="author" content="taishin">
 
   
-  <meta name="description" content="https://github.com/imathis/octopress/wiki/3rd-Party-Octopress-Themes
-">
+  <meta name="description" content="Cloudstack＋KVMの環境に普通にWindowsを追加すると、NICがe1000、DiskがIDEになってしまう。 それをVirtioにする方法 Virtioを使う場合は、OSの種類をPV-enabledのものしないといけないらしい。 CloudStack Administrator&# &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -73,6 +72,65 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <!-- Now we're back to normal posts. Note the links used under href in both headers.-->
+        <h1 class="entry-title"><a href="/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/">CloudStackにWindowsテンプレートを作成</a></h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-02T23:54:00+09:00" pubdate data-updated="true">Nov 2<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/11/02/cloudstackniwindowstenpuretowozuo-cheng/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Cloudstack＋KVMの環境に普通にWindowsを追加すると、NICがe1000、DiskがIDEになってしまう。</p>
+
+<p>それをVirtioにする方法</p>
+
+<p>Virtioを使う場合は、OSの種類をPV-enabledのものしないといけないらしい。</p>
+
+<p><a href="https://svn.apache.org/repos/asf/incubator/cloudstack/docsite/html/docs/en-US/Apache_CloudStack/4.0.0-incubating/html-single/Admin_Guide/index.html">CloudStack Administrator&#8217;s Guide</a></p>
+
+<blockquote><p>(KVM only) If you choose an OS that is PV-enabled, the VMs created from this ISO will have a SCSI (virtio) root disk. If the OS is not PV-enabled, the VMs will have an IDE root disk. The PV-enabled types are:</p></blockquote>
+
+<ol>
+<li><p>WindowsOSのISOを追加するときに、OSの種類をWindows PVにする</p></li>
+<li><p>そのISOでインスタンスをつくると、インスタンスのOSの種類もWindows PVになる</p></li>
+<li><p>起動してもVirtioのドライバがないので、ディスクが見えない。
+一旦、Windows OSのISOをデタッチして、virtio-win-0.1-30.isoををアタッチする。<br>
+<a href="http://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/">http://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/</a></p></li>
+<li><p>Virtioのドライバをインストールするとディスクが見えてくるので、
+再度WindowsのISOアタッチして、インストールできる。</p></li>
+</ol>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -180,6 +238,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/04/20/zabbix-report/">ThinReportsでZabbixのレポートを作成</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/03/17/cs-domain/">CloudStackのドメインを変更する</a>
       </li>
     
@@ -193,10 +255,6 @@
     
       <li class="post">
         <a href="/blog/2012/11/12/cloudstack-ldap/">CloudStackへのログインをLDAP認証する</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/11/12/resolvconf/">Ubuntu 12.04 では /etc/resolv.confが書き換えられる</a>
       </li>
     
   </ul>

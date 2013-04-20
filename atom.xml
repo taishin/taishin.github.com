@@ -4,7 +4,7 @@
   <title><![CDATA[G1BS.0N]]></title>
   <link href="http://taishin.github.com/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2013-03-17T10:32:20+09:00</updated>
+  <updated>2013-04-20T23:20:01+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -12,6 +12,29 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ThinReportsでZabbixのレポートを作成]]></title>
+    <link href="http://taishin.github.com/blog/2013/04/20/zabbix-report/"/>
+    <updated>2013-04-20T22:45:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2013/04/20/zabbix-report</id>
+    <content type="html"><![CDATA[<p>Zabbixのスクリーン機能で、グラフの一覧表示なんかはできますが、
+やっぱり提出用レポートとしては厳しいかと。</p>
+
+<p>WordやExcelで毎回作るのもそれは手間だなーと思ってたら
+<a href="http://www.thinreports.org/">ThinReports</a>というものを知ったので、
+これで自動でレポート作れるようにしてみました。</p>
+
+<p><a href="https://github.com/taishin/zabbxi_report">zabbix_report</a></p>
+
+<p>表紙付きでいい感じにできました。
+これはなかなかいいですね。</p>
+
+<p>強いて言えば、出力がPDFなので、WordやExcelでできたら、細かいとこ修正できていいんですが・・・</p>
+
+<p><img class="left" src="http://taishin.github.com/images/zabbix_report.png"></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[CloudStackのドメインを変更する]]></title>
