@@ -4,7 +4,7 @@
   <title><![CDATA[Category: zabbix | G1BS.0N]]></title>
   <link href="http://taishin.github.com/blog/categories/zabbix/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2013-04-20T23:20:01+09:00</updated>
+  <updated>2013-04-20T23:21:28+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -27,8 +27,9 @@
 
 <p><a href="https://github.com/taishin/zabbxi_report">zabbix_report</a></p>
 
-<p>表紙付きでいい感じにできました。
-これはなかなかいいですね。</p>
+<p>表紙付きでいい感じにできました。</p>
+
+<p>これはなかなかいいですね。</p>
 
 <p>強いて言えば、出力がPDFなので、WordやExcelでできたら、細かいとこ修正できていいんですが・・・</p>
 
