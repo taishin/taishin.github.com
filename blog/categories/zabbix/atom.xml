@@ -4,7 +4,7 @@
   <title><![CDATA[Category: zabbix | G1BS.0N]]></title>
   <link href="http://taishin.github.com/blog/categories/zabbix/atom.xml" rel="self"/>
   <link href="http://taishin.github.com/"/>
-  <updated>2013-04-20T23:21:28+09:00</updated>
+  <updated>2013-09-18T23:05:43+09:00</updated>
   <id>http://taishin.github.com/</id>
   <author>
     <name><![CDATA[taishin]]></name>
@@ -12,6 +12,104 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Zabbixでアラートメールを検知]]></title>
+    <link href="http://taishin.github.com/blog/2013/09/18/zabbixmailcheck/"/>
+    <updated>2013-09-18T21:51:00+09:00</updated>
+    <id>http://taishin.github.com/blog/2013/09/18/zabbixmailcheck</id>
+    <content type="html"><![CDATA[<p>.forward</p>
+
+<p>"|/usr/bin/ruby /usr/lib/zabbix/alertscripts/mailalert.rb |/bin/sh
+/usr/lib/zabbix/alertscripts/mailalert.sh"</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>mailalert.rb  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;h1&gt;!/us</span><span class="n">r</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">ruby</span><span class="o">&lt;</span><span class="sr">/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;h1&gt;受け取ったメールから、タイトルと本文を取得&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="nb">require</span> <span class="s1">&#39;mail&#39;</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;message = STDIN.read</span>
+</span><span class='line'><span class="sr">mail = Mail.read_from_string(message)&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="nb">puts</span> <span class="s2">&quot;Subject: &quot;</span> <span class="o">+</span> <span class="n">mail</span><span class="o">.</span><span class="n">subject</span>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'><span class="nb">puts</span> <span class="n">mail</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">to_s</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>mailalert.rb  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;!/bin/sh&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;タイトルと本文をzabbix_senderでトラッパーに送信&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;str<span class="o">=</span><span class="s2">&quot;&quot;</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;while <span class="nb">read </span>line; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span><span class="nv">str</span><span class="o">=</span><span class="s2">&quot;$str\n$line&quot;</span>
+</span><span class='line'><span class="k">done</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;host<span class="o">=</span>&lt;code&gt;echo -e <span class="nv">$str</span> | awk <span class="s1">&#39;/Host/ {print $3}&#39;</span>&lt;/code&gt; <span class="c"># メール本文からホスト情報</span>
+</span><span class='line'>を取得&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;case <span class="nv">$host</span> in
+</span><span class='line'>  server1<span class="o">)</span>     <span class="nv">itemhost</span><span class="o">=</span><span class="s2">&quot;server1&quot;</span> ;;    <span class="c"># どのホストに通知するかの定義</span>
+</span><span class='line'>  server2<span class="o">)</span>     <span class="nv">itemhost</span><span class="o">=</span><span class="s2">&quot;server2&quot;</span> ;;
+</span><span class='line'>  server3<span class="o">)</span>     <span class="nv">itemhost</span><span class="o">=</span><span class="s2">&quot;server3&quot;</span> ;;
+</span><span class='line'>  *<span class="o">)</span>               <span class="nv">itemhost</span><span class="o">=</span><span class="s2">&quot;zabbix-server&quot;</span> ;;      <span class="c">#未定義のものは</span>
+</span><span class='line'>zabbix-server
+</span><span class='line'><span class="k">esac</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;str<span class="o">=</span>&lt;code&gt;echo -e <span class="nv">$str</span>&lt;/code&gt;&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;/usr/bin/zabbix_sender -s <span class="s2">&quot;$itemhost&quot;</span> -z localhost -k mail_check -o <span class="s2">&quot;$str&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ThinReportsでZabbixのレポートを作成]]></title>

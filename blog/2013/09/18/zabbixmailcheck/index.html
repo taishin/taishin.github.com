@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Zabbixでアラートメールを検知 - G1BS.0N</title>
+  <meta name="author" content="taishin">
+
+  
+  <meta name="description" content=".forward &#8221;|/usr/bin/ruby /usr/lib/zabbix/alertscripts/mailalert.rb |/bin/sh
+/usr/lib/zabbix/alertscripts/mailalert.sh&#8221; mailalert.rb 1
+2
+3 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://taishin.github.com/blog/2013/09/18/zabbixmailcheck/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="G1BS.0N" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">87</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">G1BS.0N</a></h1>
+  
+    <h2>Tech Memo</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:taishin.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Zabbixでアラートメールを検知</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-18T21:51:00+09:00" pubdate data-updated="true">Sep 18<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>.forward</p>
+
+<p>&#8221;|/usr/bin/ruby /usr/lib/zabbix/alertscripts/mailalert.rb |/bin/sh
+/usr/lib/zabbix/alertscripts/mailalert.sh&#8221;</p>
+
+<figure class='code'><figcaption><span>mailalert.rb  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/ruby</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#受け取ったメールから、タイトルと本文を取得</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;mail&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">message</span> <span class="o">=</span> <span class="no">STDIN</span><span class="o">.</span><span class="n">read</span>
+</span><span class='line'><span class="n">mail</span> <span class="o">=</span> <span class="no">Mail</span><span class="o">.</span><span class="n">read_from_string</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;Subject: &quot;</span> <span class="o">+</span> <span class="n">mail</span><span class="o">.</span><span class="n">subject</span>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'><span class="nb">puts</span> <span class="n">mail</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">to_s</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>mailalert.rb  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># タイトルと本文をzabbix_senderでトラッパーに送信</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">str</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">while </span><span class="nb">read </span>line; <span class="k">do</span>
+</span><span class='line'><span class="k">  </span><span class="nv">str</span><span class="o">=</span><span class="s2">&quot;$str\n$line&quot;</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">host</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> -e <span class="nv">$str</span> | awk <span class="s1">&#39;/Host/ {print $3}&#39;</span><span class="sb">`</span> <span class="c"># メール本文からホスト情報</span>
+</span><span class='line'>を取得
+</span><span class='line'>
+</span><span class='line'><span class="k">case</span> <span class="nv">$host</span> in
+</span><span class='line'>  server1<span class="o">)</span>     <span class="nv">itemhost</span><span class="o">=</span><span class="s2">&quot;server1&quot;</span> ;;    <span class="c"># どのホストに通知するかの定義</span>
+</span><span class='line'>  server2<span class="o">)</span>     <span class="nv">itemhost</span><span class="o">=</span><span class="s2">&quot;server2&quot;</span> ;;
+</span><span class='line'>  server3<span class="o">)</span>     <span class="nv">itemhost</span><span class="o">=</span><span class="s2">&quot;server3&quot;</span> ;;
+</span><span class='line'>  *<span class="o">)</span>               <span class="nv">itemhost</span><span class="o">=</span><span class="s2">&quot;zabbix-server&quot;</span> ;;      <span class="c">#未定義のものは</span>
+</span><span class='line'>zabbix-server
+</span><span class='line'><span class="k">esac</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">str</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> -e <span class="nv">$str</span><span class="sb">`</span>
+</span><span class='line'>
+</span><span class='line'>/usr/bin/zabbix_sender -s <span class="s2">&quot;$itemhost&quot;</span> -z localhost -k mail_check -o <span class="s2">&quot;$str&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">taishin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-18T21:51:00+09:00" pubdate data-updated="true">Sep 18<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/zabbix/'>zabbix</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  <a href="http://b.hatena.ne.jp/entry/http://taishin.github.com/blog/2013/09/18/zabbixmailcheck/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://taishin.github.com/blog/2013/09/18/zabbixmailcheck/" data-via="taishin" data-counturl="http://taishin.github.com/blog/2013/09/18/zabbixmailcheck/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+   
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/04/20/zabbix-report/" title="Previous Post: ThinReportsでZabbixのレポートを作成">&laquo; ThinReportsでZabbixのレポートを作成</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/09/18/zabbixmailcheck/">Zabbixでアラートメールを検知</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/20/zabbix-report/">ThinReportsでZabbixのレポートを作成</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/03/17/cs-domain/">CloudStackのドメインを変更する</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/03/14/chef11/">Chef Server 11をインストール</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/02/09/zabbixde/">Zabbix2.0でESXiのVMごとに監視してみる(自動登録編)</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("taishin", 0, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/taishin" class="twitter-follow-button" data-show-count="false">Follow @taishin</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - taishin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'g1bs0n';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://taishin.github.com/blog/2013/09/18/zabbixmailcheck/';
+        var disqus_url = 'http://taishin.github.com/blog/2013/09/18/zabbixmailcheck/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
