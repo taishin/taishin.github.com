@@ -116,14 +116,9 @@ RubyのMailライブラリでタイトルと本文を取得(mailalert.rb)
 
 <p>2と3のスクリプトは一つでやるべきなんでしょうけど、bashだとメールのパースが面倒、rubyだと改行が入るとzabbix_senderでうまく送れず・・・</p>
 
-<figure class='code'><figcaption><span>.forward </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>"|/usr/bin/ruby /usr/lib/zabbix/alertscripts/mailalert.rb |/bin/sh
-</span><span class='line'>/usr/lib/zabbix/alertscripts/mailalert.sh"</span></code></pre></td></tr></table></div></figure>
-
-
-
+<p>.forward
+&#8221;|/usr/bin/ruby /usr/lib/zabbix/alertscripts/mailalert.rb |/bin/sh
+/usr/lib/zabbix/alertscripts/mailalert.sh&#8221;</p>
 
 <figure class='code'><figcaption><span>mailalert.rb  </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
